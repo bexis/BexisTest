@@ -1,0 +1,17 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": "last 2 versions, Firefox ESR, not dead",
+        "useBuiltIns": "usage",
+        "corejs": 3
+      }
+    ]
+  ],
+  "plugins": [ 
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-proposal-optional-chaining"
+  ],
+  "highlightCode":  false,
+}
