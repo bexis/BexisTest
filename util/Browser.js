@@ -62,15 +62,22 @@ class Browser {
       deviceScaleFactor: 1,
     });
 
+    // forward console output, if requested
     if (Config.browser.logConsole) {
-      tab.on('console', msg => {
-        for(let i = 0; i < msg.args().length; ++i) {
-          // eslint-disable-next-line no-console
-          console.log(`${i}: ${msg.args()[i]}`);
+      tab.on('console', async (msg) => {
+
+        // collect all parts and serialize to string
+        const out = [],
+              parts = msg.args();
+        for(let i = 0; i < parts.length; ++i) {
+          out.push( await parts[i].jsonValue() );
         }
+
+        // eslint-disable-next-line no-console
+        console.log( Config.browser.consolePrefix, out.join( ' ' ) );
+
       });
     }
-
 
     // set default timeout
     tab.setDefaultTimeout( Config.timeout );

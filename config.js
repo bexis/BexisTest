@@ -20,11 +20,15 @@ export default {
     // log the browser console to the test console?
     logConsole: false,
 
+    // prefix for browser console output in the test console
+    consolePrefix: '>',
+
   },
 
   /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX GENERAL SETTINGS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
   // default timeout for all actions (in ms)
+  // Note: test timeout is set separately in .mocharc.js
   timeout: 20 * 1000,
 
 };
