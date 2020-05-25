@@ -3,7 +3,9 @@
  */
 
 import menu from './common/menu';
+import login from './common/login';
 
 export default {
   menu,
+  login
 };

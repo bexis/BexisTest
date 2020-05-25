@@ -10,8 +10,20 @@ export default {
     // URL to open at start
     baseURL: 'http://bx2test.inf-bb.uni-jena.de:2002/',
 
+    // default user
+    userNormal: {
+      userName: 'USERNAME',
+      password: 'PASSWORD',
+    },
+
+    // admin user
+    userAdmin: {
+      userName2: 'USERNAME',
+      password2: 'PASSWORD',
+    },
+
     // hide the browser window? showing the window requires a full window environment
-    headless: true,
+    headless: false,
 
     // browser dimensions
     width: 1280,
@@ -27,8 +39,8 @@ export default {
 
   /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX GENERAL SETTINGS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
-  // default timeout for all actions (in ms)
+  // default timeout for all actions (in ms); "how long can a page.something() call last at most?"
   // Note: test timeout is set separately in .mocharc.js
-  timeout: 20 * 1000,
+  timeout: 30 * 1000,
 
 };

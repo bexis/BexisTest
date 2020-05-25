@@ -1,5 +1,5 @@
-import Browser    from '../util/Browser';
-import util       from '../util/common';
+import Browser    from '../../util/Browser';
+import util       from '../../util/common';
 import { assert } from 'chai';
 
 describe( 'Registration', () => {

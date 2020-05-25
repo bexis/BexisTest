@@ -1,9 +1,8 @@
-import Browser    from '../util/Browser';
-import util       from '../util/common';
+import Browser    from '../../util/Browser';
+import util       from '../../util/common';
 import { assert } from 'chai';
 
 describe( 'Registration', () => {
-
   createRegistrationTest( 'username',             'The Username field is required.' );
   createRegistrationTest( 'email',                'The Email field is required.' );
   createRegistrationTest( 'password',             'The Password field is required.' );
@@ -26,7 +25,7 @@ function createRegistrationTest( skipped, expMsg ) {
 
     // get a tab
     const page = await Browser.openTab();
-
+    // login.loginNormalAdmin();
     // navigate to "Register"
     await assert.isFulfilled( util.menu.select( page, 'Register' ), 'should open the register page' );
 

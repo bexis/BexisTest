@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "description": "automated integration tests for BExIS",
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha --recursive --require @babel/register",
+    "BEXIS2_BAM_Register": "cross-env NODE_ENV=test mocha --recursive './test/BEXIS2_BAM_register/*.js' --require @babel/register",
+    "BEXIS2_Dataset": "cross-env NODE_ENV=test mocha --recursive './test/BEXIS2_Dataset/*.js' --require @babel/register",
+    "BEXIS2_BAM_Login": "cross-env NODE_ENV=test mocha --recursive './test/BEXIS2_BAM_login/*.js' --require @babel/register",
+    "BEXIS2_BAM_Login:debug": "cross-env NODE_ENV=test mocha --recursive './test/BEXIS2_BAM/*.js' --inspect-brk --require  @babel/register",
     "test:ci": "cross-env NODE_ENV=test mocha --recursive --require @babel/register --reporter mocha-junit-reporter --reporter-options includePending=true"
   },
   "author": "Sirko Schindler",
@@ -17,6 +20,7 @@
     "@babel/preset-env": "^7.9.6",
     "@babel/register": "^7.9.0",
     "@babel/runtime": "^7.9.6",
+    "@types/jquery": "^3.3.38",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "chai": "^4.2.0",

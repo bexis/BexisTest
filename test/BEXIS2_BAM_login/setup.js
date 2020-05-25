@@ -1,6 +1,6 @@
 'use strict';
-import Browser        from '../util/Browser';
-import Config         from '../config';
+import Browser        from '../../util/Browser';
+import Config         from '../../config';
 import Chai           from 'chai';
 import ChaiAsPromised from 'chai-as-promised';
 
