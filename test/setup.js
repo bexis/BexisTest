@@ -1,6 +1,5 @@
-'use strict';
-import Browser        from '../../util/Browser';
-import Config         from '../../config';
+import Browser        from '../util/Browser';
+import Config         from '../config';
 import Chai           from 'chai';
 import ChaiAsPromised from 'chai-as-promised';
 
@@ -15,7 +14,7 @@ before( async () => {
 });
 
 
-after( async() => {
+after( async () => {
 
   // init the browser
   await Browser.teardown();
@@ -23,7 +22,7 @@ after( async() => {
 });
 
 
-afterEach( async() =>{
+afterEach( async () =>{
 
   // close all tabs to save some memory and prevent interactions between tabs
   if( Config.browser.headless ) {

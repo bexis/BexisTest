@@ -4,6 +4,7 @@ This repository provides a test environment to perform integration tests on a ru
 
 * [Installation and running](#installation-and-running)
 * [Writing a test(suite)](#writing-a-testsuite)
+  * [Hints](#hints)
 * [Control which tests are run](#control-which-tests-are-run)
   * [by filename](#by-file-name)
   * [by testsuite or test](#by-testsuite-or-test)
@@ -33,7 +34,7 @@ This file uses the JUnit XML format, which is recognized by most CI/CD environme
 
 ## Writing a test(suite)
 
-This repository relies on [Mocha](https://mochajs.org/) as a testrunner and [Chai](https://www.chaijs.com/) for assertions.
+This repository relies on [Mocha](https://mochajs.org/) as a test runner and [Chai](https://www.chaijs.com/) for assertions.
 For a list of possible assertions, please refer to the [Chai documentation](https://www.chaijs.com/api/assert/).
 
 As we are running all test within a (headless) browser, all actions are asynchronous.
@@ -75,6 +76,22 @@ describe( 'Registration', () => {
 
 Note that all actions themselves are wrapped in a `assert.isFulfilled()`.
 This pattern allows for easier debugging, as the test report will show which exact step failed with the respective error message.
+
+## Hints
+
+* Using `page` you have full access to the page itself. A documentation of the available functions can be found [here](https://github.com/puppeteer/puppeteer/blob/master/docs/api.md).
+
+* If you call a function of `page` that uses a callback, consider that this callback runs in a different context, so it does not have access to the local test variables. To transfer variables back and forth, use serializable variables and the respective way of passing parameters to the callbacks. The same extents to accessing libraries (e.g., jQuery in the browser context) and other code fragments.
+
+* When you action trigger some asynchronous operation like an AJAX request or an animation, use a `waitFor()` next to suspend the text execution until the async operation has finished. This may wait for events like an element to (dis)appear or an navigation to finish. 
+
+* If possible at all, don't use `waitFor()` with times (integers). This is bound to fail when the execution is delayed due to network issues or any other effect. Preferably wait for elements to appear.
+
+* Common operations should be moved to [utilities](#utilities), so they can be reused in other tests. Examples include selecting a menu entry or the login-logout-procedures.
+
+* If you want to test the same component with different inputs, consider using a generator function, that takes the inputs as parameters and execute the test. That way you remove unnecessary duplicate code.
+
+* Make sure you validate or enforce all your assumptions when starting a test. Possible side effects from previous tests include, e.g., the current login status.
 
 ## Control which tests are run
 

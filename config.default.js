@@ -8,7 +8,7 @@ export default {
   browser: {
 
     // URL to open at start
-    baseURL: 'http://bx2test.inf-bb.uni-jena.de:2002/',
+    baseURL: 'http://some.url/',
 
     // default user
     userNormal: {
@@ -23,7 +23,7 @@ export default {
     },
 
     // hide the browser window? showing the window requires a full window environment
-    headless: false,
+    headless: true,
 
     // browser dimensions
     width: 1280,

@@ -77,3 +77,4 @@ typings/
 /.settings
 /.project
 /test-results.xml
+/config.js

@@ -4,8 +4,12 @@ import Path from 'path';
 // paths to check
 const paths = [
   Path.join( __dirname, '..', 'util' ),
-  Path.join( __dirname, '..', 'test' ),
 ];
+if( 'TEST_FOLDER' in process.env ) {
+  paths.push( Path.join( __dirname, '..', 'test', process.env.TEST_FOLDER ) );
+} else {
+  paths.push( Path.join( __dirname, '..', 'test' ), );
+}
 
 // other options
 const options = {

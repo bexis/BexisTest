@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "description": "automated integration tests for BExIS",
   "scripts": {
-    "BEXIS2_BAM_Register": "cross-env NODE_ENV=test mocha --recursive './test/BEXIS2_BAM_register/*.js' --require @babel/register",
-    "BEXIS2_Dataset": "cross-env NODE_ENV=test mocha --recursive './test/BEXIS2_Dataset/*.js' --require @babel/register",
-    "BEXIS2_BAM_Login": "cross-env NODE_ENV=test mocha --recursive './test/BEXIS2_BAM_login/*.js' --require @babel/register",
-    "BEXIS2_BAM_Login:debug": "cross-env NODE_ENV=test mocha --recursive './test/BEXIS2_BAM/*.js' --inspect-brk --require  @babel/register",
-    "test:ci": "cross-env NODE_ENV=test mocha --recursive --require @babel/register --reporter mocha-junit-reporter --reporter-options includePending=true"
+    "BEXIS2_BAM_Login": "cross-env TEST_FOLDER='BEXIS2_BAM_login' mocha --recursive --require @babel/register",
+    "BEXIS2_BAM_Login:debug": "cross-env TEST_FOLDER='BEXIS2_BAM' mocha --recursive --require  @babel/register --inspect-brk",
+    "BEXIS2_BAM_Register": "cross-env TEST_FOLDER='BEXIS2_BAM_register' mocha --recursive  --require @babel/register",
+    "BEXIS2_Dataset": "cross-env TEST_FOLDER='BEXIS2_Dataset' mocha --recursive --require @babel/register",
+    "test:ci": "cross-env mocha --recursive --require @babel/register --reporter mocha-junit-reporter --reporter-options includePending=true",
+    "test": "cross-env mocha --recursive --require @babel/register"
   },
-  "author": "Sirko Schindler",
+  "author": {
+    "name":  "Sirko Schindler",
+    "email": "github@sirko.org",
+    "url":   "https://orcid.org/0000-0002-0964-4457"
+  },
   "license": "MIT",
   "dependencies": {
     "@babel/cli": "^7.8.4",
