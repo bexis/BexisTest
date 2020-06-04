@@ -20,8 +20,6 @@ export default {
  */
 async function login( page, userType = 'normal') {
 
-  if (await checkLogin( page )){logoff(page);}
-
   // navigate to "Login"
   await util.menu.select( page, 'Login' );
   // ensure page is open

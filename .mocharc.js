@@ -10,7 +10,7 @@ if( 'TEST_FOLDER' in process.env ) {
 module.exports = {
 
   // overall time for a single test to run
-  timeout: 30 * 1000,
+  timeout: 100 * 1000,
 
   // which test files to run?
   spec: folders,

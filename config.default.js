@@ -18,8 +18,8 @@ export default {
 
     // admin user
     userAdmin: {
-      userName2: 'USERNAME',
-      password2: 'PASSWORD',
+      userName: 'USERNAME',
+      password: 'PASSWORD',
     },
 
     // hide the browser window? showing the window requires a full window environment
@@ -41,6 +41,6 @@ export default {
 
   // default timeout for all actions (in ms); "how long can a page.something() call last at most?"
   // Note: test timeout is set separately in .mocharc.js
-  timeout: 30 * 1000,
+  timeout: 100 * 1000,
 
 };
