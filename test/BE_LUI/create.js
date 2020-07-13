@@ -2,10 +2,11 @@ import Browser    from '../../util/Browser';
 import util       from '../../util/common';
 import { assert } from 'chai';
 import login from '../../util/common/login';
+import elements from '../../util/common/elements';
 
 describe( 'LUI calculation', () => {
 
-  it( 'should show an error when selected parameter do not return an result', async () => {
+  it( 'should show an error when selected parameter do not return an result table for new components set', async () => {
 
     // open a new tab
     const page = await Browser.openTab();
@@ -13,44 +14,52 @@ describe( 'LUI calculation', () => {
     // ensure a normal user is logged in
     await login.loginUser (page);
 
-    // navigate to "Create dataset"
-    await assert.isFulfilled( util.menu.select( page, 'LUI Calculation' ), 'should open the LUI tool' );
+    await showRawData ( page, 'new components set');
 
-    await assert.isFulfilled( page.waitForSelector( '#divQuery0', { visible: true }), 'wait for LUI page' );
-
-    await assert.isFulfilled( page.click( 'input[value="NewSet"]' ), 'should select new dataset as base input' );
-
-    await assert.isFulfilled( page.click( 'input[value="unstandardized"]' ), 'should select raw data (unstandardized)' );
-
-    await assert.isFulfilled( page.waitForSelector( '.t-status-text', { visible: true }), 'wait for table' );
-
-    const itemNumberString = await page.$eval( '.t-status-text', (el) => el.textContent );
-    const itemNumber = itemNumberString.split(' ');
-    assert.isAbove( parseInt(itemNumber[6]), 1949,  `table should show 1950 or more items. Found: ${parseInt(itemNumber[6])}` );
+    // read total number of item in table and compare with expected
+    const itemNumber = await elements.itemNumber_Telerik ( page );
+    assert.isAbove(itemNumber , 1949,  `table should show 1950 or more items. Found: ${itemNumber}` );
   });
 
 
-  it( 'should show an error (timeout) when selected parameter do not return an result old set', async () => {
+  it( 'should show an error when selected parameter do not return an result table for old components set', async () => {
 
     // open a new tab
     const page = await Browser.openTab();
 
     // ensure a normal user is logged in
-    //await login.loginUser (page);
+    // await login.loginUser (page);
 
-    await assert.isFulfilled( util.menu.select( page, 'LUI Calculation' ), 'should open the LUI tool' );
+    await showRawData (page, 'old components set');
 
-    await assert.isFulfilled( page.waitForSelector( '#divQuery0', { visible: true }), 'wait for LUI page' );
-
-    await assert.isFulfilled( page.click( 'input[value="OldSet"]' ), 'should select old dataset as base input' );
-
-    await assert.isFulfilled( page.click( 'input[value="unstandardized"]' ), 'should select raw data (unstandardized)' );
-
-    await assert.isFulfilled( page.waitForSelector( '.status-text', { visible: true }), 'wait for table' );
-
-    // add check for real data once it is working again
+    // read total number of item in table and compare with expected
+    const itemNumber = await elements.itemNumber_Telerik ( page );
+    assert.equal(itemNumber , 1650,  `table should show 1650 items. Found: ${itemNumber}` );
   });
-
-
-
 });
+
+
+/**
+ * Navigate to LUI tool and select to show raw data
+ *
+ * @param   {Object}    page      page to work upon
+ * @param {String} type dataset type
+ */
+async function showRawData ( page, type ){
+
+  // open LUI tool
+  await assert.isFulfilled( util.menu.select( page, 'LUI Calculation' ), 'should open the LUI tool' );
+
+  // wait until page is loaded
+  await assert.isFulfilled( page.waitForSelector( '#divQuery0', { visible: true }), 'wait for LUI page' );
+
+  // select type of input data (old / new)
+  await assert.isFulfilled( page.click( 'input[value="' + type + '"]' ), 'should select new dataset as base input' );
+
+  // select unstandardized to show table with raw data
+  await assert.isFulfilled( page.click( 'input[value="unstandardized"]' ), 'should select raw data (unstandardized)' );
+
+  // wait until table is loaded
+  await assert.isFulfilled( page.waitForSelector( '.t-status-text', { visible: true }), 'wait for telerik table' );
+
+}
