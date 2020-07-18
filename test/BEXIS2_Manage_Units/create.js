@@ -5,8 +5,8 @@ import { assert } from 'chai';
 import login from '../../util/common/login';
 
 describe( 'Creates Unit', () => {
-  createManageUnitTest( 'name' );
-  createManageUnitTest( 'abbreviation' );
+  createManageUnitTest( 'unit.test.name' );
+  createManageUnitTest( 'unit.test.abv' );
   createManageUnitTest( 'dimensionName' );
   createManageUnitTest( '' );
 });
@@ -21,10 +21,9 @@ it( 'should login', async () => {
 });
 
 /**
- * create a test for registration with one field not filled
+ * create a test for Manage Units with required field not filled
  *
  * @param   {String}    skipped     field to be left empty
- * @param   {String}    expMsg      expected error message
  */
 
 async function createManageUnitTest(skipped) {
@@ -37,23 +36,25 @@ async function createManageUnitTest(skipped) {
 
     await assert.isFulfilled( page.waitForSelector( '#information-container', { visible: true }), 'wait for manage units page' );
 
+    // count the number of rows before a new entry
+    const rowCountBefore = (await page.$$('#bx-rpm-unitGrid > table > tbody > tr')).length;
+
     // click Create Unit button
     await assert.isFulfilled( page.click( '.bx-button' ), 'should click "Create Unit" button' );
 
-    // **there is typo in id name. It has to be #UnitWindow instead of #UintWindow**
     await assert.isFulfilled( page.waitForSelector( '#UintWindow', { visible: true }), 'wait for Create Unit form' );
 
     // find Name input
-    if ( !('name' == skipped) ){
-      await assert.isFulfilled( page.type( '#Unit_Name', 'sterdian'), 'should enter a name' );
+    if ( !('unit.test.name' == skipped) ){
+      await assert.isFulfilled( page.type( '#Unit_Name', 'unit.test.name'), 'should enter a name' );
     }
 
     // find Abbreviation input
-    if ( !('abbreviation' == skipped) ){
-      await assert.isFulfilled( page.type( '#Unit_Abbreviation', 'sr'), 'should enter an abbreviation' );
+    if ( !('unit.test.abv' == skipped) ){
+      await assert.isFulfilled( page.type( '#Unit_Abbreviation', 'unit.test.abv'), 'should enter an abbreviation' );
     }
     // find Description input
-    await assert.isFulfilled( page.type( '#Unit_Description', 'some description'), 'should enter a description' );
+    await assert.isFulfilled( page.type( '#Unit_Description', 'unit.test.desc'), 'should enter a description' );
 
     // random number gerenerator for Dimension Name
     const randomDimName = Math.floor(Math.random() * 38) + 1;
@@ -67,7 +68,7 @@ async function createManageUnitTest(skipped) {
       // click dropdown menu for Dimension Name menu
       await assert.isFulfilled( page.click( '#createUnit > form > table > tbody > tr:nth-child(4) > td:nth-child(2) > div > div > span'), 'should open dimension name structure' );
 
-      // choose Dimension Name value
+      // choose a random Dimension Name value
       await assert.isFulfilled( page.click( `body > div.t-animation-container > div > ul > li:nth-child(${randomDimName})`), 'should choose a dimension name' );
 
       // click dropdown menu for Measurement System menu
@@ -76,7 +77,7 @@ async function createManageUnitTest(skipped) {
       // there are more than one of the same class name, so it chooses the first selector
       const selectors = await page.$$(`body > div.t-animation-container > div > ul > li:nth-child(${randomMeasure})`);
 
-      // choose Meausrment System value
+      // choose a random Measurement System value
       await selectors[1].click();
     }
 
@@ -88,18 +89,35 @@ async function createManageUnitTest(skipped) {
     // random number gerenerator for Data Type
     const randomDataType = Math.floor(Math.random() * 7) + 1;
 
-    // choose a datatype
+    // choose a random Data Type
     await assert.isFulfilled( page.click(`#bx-rpm-selectDataTypeGrid > div.t-grid-content > table > tbody > tr:nth-child(${randomDataType}) > td:nth-child(1) > input` ), 'should click the first Data Type from the table' );
 
     // click save button and wait for the navigation
     await Promise.all([
       page.waitForNavigation(),
-      page.click('#saveButton'),
+      assert.isFulfilled(page.click('#saveButton'), 'should save the new unit' ),
     ]);
 
-    await page.waitFor(2000);
+    if ( !('' == skipped) ){
+      await Promise.all([
+        page.waitForNavigation(),
+        assert.isFulfilled(page.click('#UintWindow > div.t-window-titlebar.t-header > div > a > span'), 'should close the create unit page' ),
+      ]);
+    }
 
-    // close the tab
-    await Browser.closeTabs();
+    await assert.isFulfilled( page.waitForSelector( '#bx-rpm-unitGrid > table > tbody > tr', { visible: true }), ' should wait for the table' );
+
+    // count the number of rows before a new entry
+    const rowCountAfter = (await page.$$('#bx-rpm-unitGrid > table > tbody > tr')).length;
+
+    // find difference between rows
+    const diffRows = rowCountAfter - rowCountBefore;
+
+    // checks if a new entry is added or not
+    if ( diffRows === 0 ) {
+      assert.equal(rowCountBefore, rowCountAfter, 'No new entry is added');
+    } else if ( diffRows === 1) {
+      assert.notEqual(rowCountBefore, rowCountAfter, 'New entry is added');
+    }
   });
 }
