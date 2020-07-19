@@ -8,6 +8,7 @@ import util       from '../common';
 export default {
   loginUser:  (page) => login( page, 'normal' ),
   loginAdmin:  (page) => login( page, 'admin' ),
+  loginUserBEXIS1:  (page) => loginBEXIS1( page, 'normal' ),
   logoff: logoff,
 };
 
@@ -66,4 +67,31 @@ async function checkLogin ( page ){
   }
   else
     return true;
+}
+
+/**
+ * login
+ *
+ * @param   {Object}    page      page to work upon
+ * @param   {String}    userType  type of user
+ */
+async function loginBEXIS1( page, userType = 'normal') {
+
+  // wait for login page
+  await page.waitForSelector ('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_UserName');
+
+  // fill user name and password
+  if (userType == 'normal'){
+    await page.type('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_UserName'  , Config.browser2.userNormal.userName);
+    await page.type('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_Password'  , Config.browser2.userNormal.password);
+  }
+  else if (userType == 'admin'){
+    await page.type('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_UserName'  , Config.browser2.userAdmin.userName);
+    await page.type('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_Password'  , Config.browser2.userAdmin.password);
+  }
+  // submit
+  await page.click( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_LoginButton' );
+
+  // wait for landing page after login.
+  await page.waitForSelector( '#ctl00_ctl00_LoginStatus1');
 }
