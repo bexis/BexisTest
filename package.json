@@ -8,6 +8,7 @@
     "BEXIS2_BAM_Register": "cross-env TEST_FOLDER='BEXIS2_BAM_register' mocha --recursive  --require @babel/register",
     "BEXIS2_Dataset": "cross-env TEST_FOLDER='BEXIS2_Dataset' mocha --recursive --require @babel/register",
     "BE_LUI": "cross-env TEST_FOLDER='BE_LUI' mocha --recursive --require @babel/register",
+    "B2toB1compare_LUI": "cross-env TEST_FOLDER='B2toB1compare_LUI' mocha --recursive --require @babel/register",
     "RUN_ALL:ci": "cross-env mocha --recursive --require @babel/register --reporter mocha-junit-reporter --reporter-options includePending=true",
     "RUN_ALL": "cross-env mocha --recursive --require @babel/register"
   },
