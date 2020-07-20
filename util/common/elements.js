@@ -79,10 +79,10 @@ async function filterTable_Telerik(page, filterText){
  * @param {string} nthColumn
  */
 async function extractFirstRowNthColumnValue_Telerik(page, tableId, nthColumn ){
-  const result =  await page.evaluate(`(async() => {
-    const result = document.querySelector('#`+ tableId +' tbody tr:nth-child(1) td:nth-child('+ nthColumn +`)').textContent;
+  const result =  await page.evaluate( ( tableId, nthColumn) => {
+    const result = document.querySelector(`#${tableId} tbody tr:nth-child(1) td:nth-child(${nthColumn})`).textContent;
     return result;
-  })()`);
+  }, tableId, nthColumn);
 
   return result;
 }
