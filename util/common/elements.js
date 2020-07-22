@@ -6,6 +6,7 @@
 export default {
   itemNumber_Telerik : itemNumber_Telerik,
   //itemNumber_DataTables : itemNumber_DataTables
+  returnTableContent_Telerik : returnTableContent_Telerik,
   clickElementByLabelText : clickElementByLabelText,
   findTableRowByTableCellText : findTableRowByTableCellText,
   filterTable_Telerik : filterTable_Telerik,
@@ -27,6 +28,24 @@ async function itemNumber_Telerik( page ) {
 
   return parseInt(itemNumber[6]);
 }
+
+/**
+ * Return table content from telerik table
+ *
+ * @param {Object} page page to work upon
+ * @param {String} tableId table id
+ */
+async function returnTableContent_Telerik( page, tableId ) {
+  const result = await page.evaluate((tableId) => {
+    const rows = document.querySelectorAll(`#${tableId} tr`);
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll('td');
+      return Array.from(columns, column => column.innerText);
+    });
+  }, tableId);
+  return result;
+}
+
 
 
 /**
