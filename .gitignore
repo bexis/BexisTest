@@ -78,3 +78,4 @@ typings/
 /.project
 /test-results.xml
 /config.js
+/package-lock.json
