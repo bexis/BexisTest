@@ -6,11 +6,14 @@
 export default {
   itemNumber_Telerik : itemNumber_Telerik,
   //itemNumber_DataTables : itemNumber_DataTables
-  returnTableContent_Telerik : returnTableContent_Telerik,
-  clickElementByLabelText : clickElementByLabelText,
+  returnTableContent_Telerik,
+  returnTableContent_MMM,
+  clickElementByLabelText,
+  clickElementByLinkText : clickElementByLinkText,
   findTableRowByTableCellText : findTableRowByTableCellText,
   filterTable_Telerik : filterTable_Telerik,
-  extractFirstRowNthColumnValue_Telerik : extractFirstRowNthColumnValue_Telerik
+  extractFirstRowNthColumnValue_Telerik : extractFirstRowNthColumnValue_Telerik,
+  returnSelectContent
 };
 
 
@@ -46,7 +49,21 @@ async function returnTableContent_Telerik( page, tableId ) {
   return result;
 }
 
-
+/**
+ * Return table content from telerik table
+ *
+ * @param {Object} page page to work upon
+ */
+async function returnTableContent_MMM( page) {
+  const result = await page.evaluate(() => {
+    const rows = document.querySelectorAll('.mmm-Container tr.hidden');
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll('td');
+      return Array.from(columns, column => column.innerText);
+    });
+  });
+  return result;
+}
 
 /**
  * Find element by lable and click on it
@@ -56,6 +73,17 @@ async function returnTableContent_Telerik( page, tableId ) {
  */
 async function clickElementByLabelText(page, text){
   const element = await page.$x('//label[text() ="'+text+'"]');
+  await (await element[0].asElement()).click();
+}
+
+/**
+ * Find element by lable and click on it
+ *
+ * @param {{ $x: (arg0: string) => any; }} page
+ * @param {string} text
+ */
+async function clickElementByLinkText(page, text){
+  const element = await page.$x('//a[text() ="'+text+'"]');
   await (await element[0].asElement()).click();
 }
 
@@ -103,5 +131,19 @@ async function extractFirstRowNthColumnValue_Telerik(page, tableId, nthColumn ){
     return result;
   }, tableId, nthColumn);
 
+  return result;
+}
+
+
+/**
+ * Return table content from telerik table
+ *
+ * @param {Object} page page to work upon
+ */
+async function returnSelectContent( page) {
+  const result = await page.evaluate(() => {
+    const rows = document.querySelectorAll('#VersionSelect option');
+    return Array.from(rows, row => row.textContent);
+  });
   return result;
 }
