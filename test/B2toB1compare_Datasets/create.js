@@ -1,10 +1,11 @@
 import Browser    from '../../util/Browser';
-import { assert } from 'chai';
+import { assert, util } from 'chai';
 import login from '../../util/common/login';
 import elements from '../../util/common/elements';
 import moment from '../../node_modules/moment';
 import Config     from '../../config';
 import ds_ids from '../B2toB1compare_Datasets/dataset_ids';
+import common from '../../util/common';
 
 
 /** @type {number} */
@@ -14,18 +15,19 @@ var count_b2 = 0;
 var datesB1 = [];
 
 var dataset_ids = ds_ids.dataset_Ids();
-var dataset_subset = dataset_ids.slice(1130, 1200);
+var dataset_subset = dataset_ids.slice(0, 50);
+
+var unstructured_dataset_ids = ds_ids.unstructured_Ids();
 
 
-
-describe( 'Compare datasets', () => {
+describe.skip( 'Compare structured datasets', () => {
 
   for (let i = 0; i < dataset_subset.length; i++) {
-    compare_datasets(dataset_subset[i]);
+    //compare_datasets(dataset_subset[i]);
   }
-  //compare_datasets(4302);
+  //compare_datasets(25086);
 
-  it.only('print result for collected dates', async () => {
+  it('print result for collected dates', async () => {
     console.log(datesB1);
   });
 
@@ -44,7 +46,7 @@ describe( 'Compare datasets', () => {
     const count_b1 = await countDS_BEXIS1( page2);
 
     // get result table first page
-    const resultTable = await returnTable_BEXIS1 (page2);
+    const resultTable = await returnTable_structured_BEXIS1 (page2);
     console.log(resultTable);
 
     // compare with expected value total count
@@ -80,6 +82,15 @@ describe( 'Compare datasets', () => {
   });
 });
 
+describe.only('Compare unstructured ', () => {
+
+  for (let i = 0; i < unstructured_dataset_ids.length; i++) {
+    compare_unstructured_datasets(unstructured_dataset_ids[i]);
+  }
+  // compare_unstructured_datasets(18726);
+
+});
+
 /**
  * @param {string | number} id
  */
@@ -104,11 +115,19 @@ async function compare_datasets(id){
     // navigate to show data page
     await assert.isFulfilled( page2.goto( Config.browser2.baseURL + '/Data/ShowData.aspx?DatasetId=' + id ), 'should open show data page' );
 
+    // sort by obdId
+
+    // await page2.evaluate(() => {
+    //   document.querySelectorAll('#ctl00_ContentPlaceHolder_Main_BlockDataControl2_GridView1')[0].classList.add('show_table');
+    // });
+    // await assert.isFulfilled( elements.clickElementByLinkText(page2, 'obsId'), ' Should click on obsId to sort by obsId');
+    // await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
+
     // get total number of datasets
     count_b1 = await countDS_BEXIS1( page2);
 
     // get result table first page
-    const resultTable_b1 = await returnTable_BEXIS1 (page2);
+    const resultTable_b1 = await returnTable_structured_BEXIS1 (page2);
     //console.log(resultTable_b1);
 
     // open tab
@@ -187,6 +206,103 @@ async function compare_datasets(id){
 }
 
 /**
+ * Compare total count of unstructured datasets in BEXIS 1 and BEXIS 2
+ *
+ * @param { string | number} id
+ */
+async function compare_unstructured_datasets( id ){
+
+  // check total count
+  it(`${id} - compare data B1 & B2`, async () => {
+    var countFilesb1 = null;
+    var countFilesb2 = null;
+
+    // open tab in BEXIS 1
+    const page2 = await Browser.openTab(true);
+
+    // ensure user is logged in BEXIS 1
+    const element = await page2.$x('//a[text()="Logout"]');
+    if (await element[0] == null){
+      await login.loginUserBEXIS1(page2);
+    }
+
+    // navigate to show data page for unstructured data
+    await assert.isFulfilled( page2.goto( Config.browser2.baseURL + '/Data/ShowUnstructuredData.aspx?DatasetId=' + id ), 'should open show data page for unstructured data' );
+
+    // get result table for first page
+    const resultTable_b1 = await returnTable_unstructured_BEXIS1 (page2);
+
+    // check, if more then 10 files are shwon (indicated by the paging entries in the last line)
+    if (resultTable_b1[resultTable_b1.length -1][0] == '1'){
+
+      // calculate count for all fully filled pages (10 each)
+      countFilesb1 = (resultTable_b1[resultTable_b1.length -1].length -1)*10;
+
+      // add class to table to have something to check, if the table was replaced by new content
+      await page2.evaluate(() => {
+        document.querySelectorAll('#ctl00_ContentPlaceHolder_Main_GridView1')[0].classList.add('show_table');
+      });
+
+      // click in the last page
+      await assert.isFulfilled( elements.clickElementByLinkText(page2, resultTable_b1[resultTable_b1.length -1].length.toString()), ' Should click on last page');
+
+      // wait for the new result (ready, when the added class disappeared)
+      await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
+
+      // get file list from last page
+      const last_page = await returnTable_unstructured_BEXIS1 (page2);
+
+      // calculate total count
+      countFilesb1 = countFilesb1 + last_page.length-3;
+
+    }
+    else{
+      // use count from dirst page
+      countFilesb1 = resultTable_b1.length -1;
+    }
+
+    console.log(resultTable_b1);
+
+    // check if files uploaded in BEXIS 1. Only check in BEXIS 2 if files are uploaded.
+    if (resultTable_b1[0][0] != 'No files in dataset.'){
+
+      // open tab
+      const page = await Browser.openTab();
+
+      // ensure user is logged in BEXIS 2
+      const elem = await page.$x('//a[text()="Login"]');
+      if (await elem[0] != null){
+        await login.loginUser(page);
+      }
+
+      // navigate to dataset page
+      await assert.isFulfilled( page.goto( Config.browser.baseURL + '/ddm/data/Showdata/' + id ), 'should dataset view' );
+
+      // open primary data tab
+      await assert.isFulfilled( page.click( '#primarydata' ), 'should select primary data' );
+
+      // wait table is shown
+      await assert.isFulfilled( page.waitForSelector( '.mmm-media' ), 'should select primary data' );
+
+      // get shown files
+      const resultTable_b2 = await elements.returnTableContent_MMM (page );
+      console.log(resultTable_b2);
+
+      // set totel count
+      countFilesb2 = resultTable_b2.length;
+    }
+    // if not files uploaded in BEXIS 1, do not check in BEXIS 2 and seit both counts to 0.
+    else {
+      countFilesb1 = 0;
+      countFilesb2 = 0;
+    }
+
+    // compare number of files in BEXIS 1 and BEXIS 2
+    assert.equal (countFilesb2, countFilesb1, 'should have same reuslt');
+  });
+}
+
+/**
  * Return total count of dataset in BEXIS 1
  *
  * @param {Object} page
@@ -198,18 +314,36 @@ async function countDS_BEXIS1( page ) {
 }
 
 /**
+ * Return table content from unstructured table in BEXIS 1
+ *
+ * @param {Object} page
+ */
+async function returnTable_unstructured_BEXIS1( page ) {
+  return await returnTable_BEXIS1( page , 'ctl00_ContentPlaceHolder_Main_GridView1');
+}
+
+/**
+ * Return table content from structured table in BEXIS 1
+ *
+ * @param {Object} page
+ */
+async function returnTable_structured_BEXIS1( page ) {
+  return await returnTable_BEXIS1( page , 'ctl00_ContentPlaceHolder_Main_BlockDataControl2_GridView1', ':not(:first-child)');
+}
+
+/**
  * Return result table in BEXIS 1
  *
- * @param {import("puppeteer").Page} page
+ * @param {Object} page
  */
-async function returnTable_BEXIS1( page ) {
-  const result = await page.evaluate(() => {
-    const rows = document.querySelectorAll('#ctl00_ContentPlaceHolder_Main_BlockDataControl2_GridView1 tr');
+async function returnTable_BEXIS1( page , tableId, rowCondition = '') {
+  const result = await page.evaluate((tableId, rowCondition) => {
+    const rows = document.querySelectorAll(`#${tableId} tr`);
     return Array.from(rows, row => {
-      const columns = row.querySelectorAll('td:not(:first-child)');
+      const columns = row.querySelectorAll(`td${rowCondition}`);
       return Array.from(columns, column => column.innerText);
     });
-  });
+  }, tableId, rowCondition);
 
   return result;
 }
