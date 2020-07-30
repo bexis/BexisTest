@@ -1,8 +1,8 @@
-import Browser    from '../../util/Browser';
-import util       from '../../util/common';
+import Browser    from '../../../util/Browser';
+import util       from '../../../util/common';
 import { assert } from 'chai';
-import login from '../../util/common/login';
-import elements from '../../util/common/elements';
+import login from '../../../util/common/login';
+import elements from '../../../util/common/elements';
 
 export default {
   calculateLUI

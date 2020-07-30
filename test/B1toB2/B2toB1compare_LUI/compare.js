@@ -1,9 +1,9 @@
-import Browser    from '../../util/Browser';
+import Browser    from '../../../util/Browser';
 import { assert } from 'chai';
-import login from '../../util/common/login';
-import elements from '../../util/common/elements';
-import lui_calc from '../BE_LUI/check';
-import bexis1 from '../../util/common/bexis1';
+import login from '../../../util/common/login';
+import elements from '../../../util/common/elements';
+import lui_calc from '../../BE/BE_LUI/check';
+import bexis1 from '../../../util/common/bexis1';
 
 
 describe( 'Compare LUI calculation', () => {

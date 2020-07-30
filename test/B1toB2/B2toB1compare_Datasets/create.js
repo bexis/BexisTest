@@ -1,11 +1,11 @@
-import Browser    from '../../util/Browser';
+import Browser    from '../../../util/Browser';
 import { assert, util } from 'chai';
-import login from '../../util/common/login';
-import elements from '../../util/common/elements';
-import moment from '../../node_modules/moment';
-import Config     from '../../config';
+import login from '../../../util/common/login';
+import elements from '../../../util/common/elements';
+import moment from '../../../node_modules/moment';
+import Config     from '../../../config';
 import ds_ids from '../B2toB1compare_Datasets/dataset_ids';
-import bexis1 from '../../util/common/bexis1';
+import bexis1 from '../../../util/common/bexis1';
 
 
 /** @type {number} */
