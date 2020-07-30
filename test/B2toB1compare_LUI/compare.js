@@ -2,7 +2,7 @@ import Browser    from '../../util/Browser';
 import { assert } from 'chai';
 import login from '../../util/common/login';
 import elements from '../../util/common/elements';
-import lui_calc from '../BE_LUI/create';
+import lui_calc from '../BE_LUI/check';
 import bexis1 from '../../util/common/bexis1';
 
 
