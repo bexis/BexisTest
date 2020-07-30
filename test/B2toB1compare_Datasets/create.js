@@ -5,7 +5,7 @@ import elements from '../../util/common/elements';
 import moment from '../../node_modules/moment';
 import Config     from '../../config';
 import ds_ids from '../B2toB1compare_Datasets/dataset_ids';
-import common from '../../util/common';
+import bexis1 from '../../util/common/bexis1';
 
 
 /** @type {number} */
@@ -43,10 +43,10 @@ describe.skip( 'Compare structured datasets', () => {
     await assert.isFulfilled( page2.goto( 'https://www.bexis.uni-jena.de/Data/ShowData.aspx?DatasetId=2320' ), 'should open show data page' );
 
     // get total number of datasets
-    const count_b1 = await countDS_BEXIS1( page2);
+    const count_b1 = await bexis1.countDS_BEXIS1( page2);
 
     // get result table first page
-    const resultTable = await returnTable_structured_BEXIS1 (page2);
+    const resultTable = await bexis1.returnTable_structured_BEXIS1 (page2);
     console.log(resultTable);
 
     // compare with expected value total count
@@ -106,11 +106,7 @@ async function compare_datasets(id){
     const page2 = await Browser.openTab(true);
 
     // ensure user is logged in BEXIS 1
-    const element = await page2.$x('//a[text()="Logout"]');
-
-    if (await element[0] == null){
-      await login.loginUserBEXIS1(page2);
-    }
+    await bexis1.checkAndLoginUser_BEXIS1(page2);
 
     // navigate to show data page
     await assert.isFulfilled( page2.goto( Config.browser2.baseURL + '/Data/ShowData.aspx?DatasetId=' + id ), 'should open show data page' );
@@ -124,22 +120,18 @@ async function compare_datasets(id){
     // await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
 
     // get total number of datasets
-    count_b1 = await countDS_BEXIS1( page2);
+    count_b1 = await bexis1.countDS_BEXIS1( page2);
 
     // get result table first page
-    const resultTable_b1 = await returnTable_structured_BEXIS1 (page2);
+    const resultTable_b1 = await bexis1.returnTable_structured_BEXIS1( page2 );
     //console.log(resultTable_b1);
 
     // open tab
     const page = await Browser.openTab();
 
-    // ensure user is logged in BEXIS 1
-    const elem = await page.$x('//a[text()="Login"]');
-
     // ensure user is logged in BEXIS 2
-    if (await elem[0] != null){
-      await login.loginUser(page);
-    }
+    await login.checkAndLoginUser( page );
+
 
     // navigate to dataset page
     await assert.isFulfilled( page.goto( Config.browser.baseURL + '/ddm/data/Showdata/' + id ), 'should dataset view' );
@@ -221,16 +213,13 @@ async function compare_unstructured_datasets( id ){
     const page2 = await Browser.openTab(true);
 
     // ensure user is logged in BEXIS 1
-    const element = await page2.$x('//a[text()="Logout"]');
-    if (await element[0] == null){
-      await login.loginUserBEXIS1(page2);
-    }
+    await bexis1.checkAndLoginUser_BEXIS1(page2);
 
     // navigate to show data page for unstructured data
     await assert.isFulfilled( page2.goto( Config.browser2.baseURL + '/Data/ShowUnstructuredData.aspx?DatasetId=' + id ), 'should open show data page for unstructured data' );
 
     // get result table for first page
-    const resultTable_b1 = await returnTable_unstructured_BEXIS1 (page2);
+    const resultTable_b1 = await bexis1.returnTable_unstructured_BEXIS1(page2);
 
     // check, if more then 10 files are shwon (indicated by the paging entries in the last line)
     if (resultTable_b1[resultTable_b1.length -1][0] == '1'){
@@ -250,7 +239,7 @@ async function compare_unstructured_datasets( id ){
       await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
 
       // get file list from last page
-      const last_page = await returnTable_unstructured_BEXIS1 (page2);
+      const last_page = await bexis1.returnTable_unstructured_BEXIS1(page2);
 
       // calculate total count
       countFilesb1 = countFilesb1 + last_page.length-3;
@@ -270,10 +259,7 @@ async function compare_unstructured_datasets( id ){
       const page = await Browser.openTab();
 
       // ensure user is logged in BEXIS 2
-      const elem = await page.$x('//a[text()="Login"]');
-      if (await elem[0] != null){
-        await login.loginUser(page);
-      }
+      await login.checkAndLoginUser( page );
 
       // navigate to dataset page
       await assert.isFulfilled( page.goto( Config.browser.baseURL + '/ddm/data/Showdata/' + id ), 'should dataset view' );
@@ -300,50 +286,4 @@ async function compare_unstructured_datasets( id ){
     // compare number of files in BEXIS 1 and BEXIS 2
     assert.equal (countFilesb2, countFilesb1, 'should have same reuslt');
   });
-}
-
-/**
- * Return total count of dataset in BEXIS 1
- *
- * @param {Object} page
- */
-async function countDS_BEXIS1( page ) {
-  const countDS = await page.$eval( '#ctl00_ContentPlaceHolder_Main_BlockDataControl2_Label_NumObs', (el) => el.textContent );
-
-  return parseInt(countDS);
-}
-
-/**
- * Return table content from unstructured table in BEXIS 1
- *
- * @param {Object} page
- */
-async function returnTable_unstructured_BEXIS1( page ) {
-  return await returnTable_BEXIS1( page , 'ctl00_ContentPlaceHolder_Main_GridView1');
-}
-
-/**
- * Return table content from structured table in BEXIS 1
- *
- * @param {Object} page
- */
-async function returnTable_structured_BEXIS1( page ) {
-  return await returnTable_BEXIS1( page , 'ctl00_ContentPlaceHolder_Main_BlockDataControl2_GridView1', ':not(:first-child)');
-}
-
-/**
- * Return result table in BEXIS 1
- *
- * @param {Object} page
- */
-async function returnTable_BEXIS1( page , tableId, rowCondition = '') {
-  const result = await page.evaluate((tableId, rowCondition) => {
-    const rows = document.querySelectorAll(`#${tableId} tr`);
-    return Array.from(rows, row => {
-      const columns = row.querySelectorAll(`td${rowCondition}`);
-      return Array.from(columns, column => column.innerText);
-    });
-  }, tableId, rowCondition);
-
-  return result;
 }

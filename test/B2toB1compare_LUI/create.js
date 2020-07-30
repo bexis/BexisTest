@@ -3,17 +3,18 @@ import { assert } from 'chai';
 import login from '../../util/common/login';
 import elements from '../../util/common/elements';
 import lui_calc from '../BE_LUI/create';
+import bexis1 from '../../util/common/bexis1';
 
 
 describe( 'Compare LUI calculation', () => {
 
   // check only B1
-  it.skip('B1 Lui test', async () => {
+  it('B1 Lui test', async () => {
     // open tab
     const page2 = await Browser.openTab(true);
 
     // ensure user is logged in BEXIS 1
-    await login.loginUserBEXIS1(page2);
+    await bexis1.loginUserBEXIS1(page2);
 
     // LUI calculation. Returns value row for plot AEG1
     const result = await calculateLUIBEXIS1( page2, 'old components set', 'global', ['HAI', 'SCH'], ['2012', '2013'], 'overall', 'EPs');
@@ -26,7 +27,7 @@ describe( 'Compare LUI calculation', () => {
 
   });
 
-  it.only('Compare', async () => {
+  it.skip('Compare', async () => {
 
     // open a new tab in BEXIS 2
     const page = await Browser.openTab();
@@ -41,7 +42,7 @@ describe( 'Compare LUI calculation', () => {
     const page2 = await Browser.openTab(true);
 
     // ensure a normal user is logged in BEXIS 1
-    await login.loginUserBEXIS1(page2);
+    await bexis1.loginUserBEXIS1(page2);
 
     // calculate LUI in Bexis 1
     const resultB1 = await calculateLUIBEXIS1( page2, 'old components set', 'global', ['HAI', 'SCH'], ['2012', '2013'], 'overall', 'EPs');

@@ -5,10 +5,12 @@ import Config     from '../../config';
 import util       from '../common';
 
 
-export default {
+export default
+{
   loginUser:  (page) => login( page, 'normal' ),
   loginAdmin:  (page) => login( page, 'admin' ),
-  loginUserBEXIS1:  (page) => loginBEXIS1( page, 'normal' ),
+  checkAndLoginUser: (page) => checkAndLogin( page, 'normal' ),
+  checkAndLoginAdmin: (page) => checkAndLogin( page, 'admin' ),
   logoff: logoff,
 };
 
@@ -43,6 +45,21 @@ async function login( page, userType = 'normal') {
 }
 
 /**
+ * Check, if a user is still logged in. Login, if not.
+ *
+ * @param   {Object}    page      page to work upon
+ * @param   {String}    userType  type of user
+ */
+async function checkAndLogin( page , userType){
+  const elem = await page.$x('//a[text()="Login"]');
+
+  if (await elem[0] != null){
+    await login(page, userType);
+  }
+
+}
+
+/**
  * Log off
  * @param {Object} page
  */
@@ -67,31 +84,4 @@ async function checkLogin ( page ){
   }
   else
     return true;
-}
-
-/**
- * login
- *
- * @param   {Object}    page      page to work upon
- * @param   {String}    userType  type of user
- */
-async function loginBEXIS1( page, userType = 'normal') {
-
-  // wait for login page
-  await page.waitForSelector ('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_UserName');
-
-  // fill user name and password
-  if (userType == 'normal'){
-    await page.type('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_UserName'  , Config.browser2.userNormal.userName);
-    await page.type('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_Password'  , Config.browser2.userNormal.password);
-  }
-  else if (userType == 'admin'){
-    await page.type('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_UserName'  , Config.browser2.userAdmin.userName);
-    await page.type('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_Password'  , Config.browser2.userAdmin.password);
-  }
-  // submit
-  await page.click( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_LoginView1_Login1_LoginButton' );
-
-  // wait for landing page after login.
-  await page.waitForSelector( '#ctl00_ctl00_LoginStatus1');
 }
