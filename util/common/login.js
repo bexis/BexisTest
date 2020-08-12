@@ -5,9 +5,12 @@ import Config     from '../../config';
 import util       from '../common';
 
 
-export default {
+export default
+{
   loginUser:  (page) => login( page, 'normal' ),
   loginAdmin:  (page) => login( page, 'admin' ),
+  checkAndLoginUser: (page) => checkAndLogin( page, 'normal' ),
+  checkAndLoginAdmin: (page) => checkAndLogin( page, 'admin' ),
   logoff: logoff,
 };
 
@@ -39,6 +42,21 @@ async function login( page, userType = 'normal') {
 
   // wait for landing page after login. Attension: This may differ according to instance settings!!!
   await page.waitForSelector ('#search_Components');
+}
+
+/**
+ * Check, if a user is still logged in. Login, if not.
+ *
+ * @param   {Object}    page      page to work upon
+ * @param   {String}    userType  type of user
+ */
+async function checkAndLogin( page , userType){
+  const elem = await page.$x('//a[text()="Login"]');
+
+  if (await elem[0] != null){
+    await login(page, userType);
+  }
+
 }
 
 /**

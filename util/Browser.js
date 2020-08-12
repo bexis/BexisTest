@@ -52,7 +52,7 @@ class Browser {
   /**
    * open a tab with our page loaded
    */
-  async openTab(){
+  async openTab(secondURL = false){
 
     // open the tab
     const tab = await this._context.newPage();
@@ -83,8 +83,15 @@ class Browser {
     tab.setDefaultTimeout( Config.timeout );
     tab.ACTION_TIMEOUT = Config.timeout;
 
+
+    if (secondURL == false){
     // load page from URL
-    await tab.goto( Config.browser.baseURL );
+      await tab.goto( Config.browser.baseURL );
+    }
+    else{
+      await tab.goto( Config.browser2.baseURL );
+    }
+
 
     // relay access to the tests
     return tab;
