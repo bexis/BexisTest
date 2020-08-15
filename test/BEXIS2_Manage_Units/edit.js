@@ -3,7 +3,7 @@ import util from '../../util/common';
 import { assert } from 'chai';
 import units from './unitElements';
 
-require('./create.js');
+require('./duplicate.js');
 
 describe('Edit Unit', () => {
 
