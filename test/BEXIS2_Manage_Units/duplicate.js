@@ -40,5 +40,24 @@ describe('Duplicate Unit', () => {
     // click Save button
     await assert.isFulfilled(page.click('#saveButton'), 'should save the new unit');
   });
-});
 
+  it('should not edit duplicate name and abbreviation', async () => {
+
+    const page = await Browser.openTab();
+
+    // filter unit description in the table
+    await assert.isFulfilled(units.filterDescription(page, util));
+
+    // click the Edit icon
+    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr:nth-child(1) > td:nth-child(8) > div > a.bx.bx-grid-function.bx-edit'), 'should click the edit icon');
+
+    // wait until the unit window is loaded in view mode
+    await assert.isFulfilled(page.waitForSelector('#UintWindow', { visible: true }), 'wait for create unit form');
+
+    // choose a Dimesion Name
+    await assert.isFulfilled(units.chooseDimensionName(page), 'should choose a new dimension name');
+
+    // save the edited unit
+    await assert.isFulfilled(page.click('#saveButton'), 'should save the edited unit');
+  });
+});
