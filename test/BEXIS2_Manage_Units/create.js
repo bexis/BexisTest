@@ -1,24 +1,24 @@
 import Browser from '../../util/Browser';
 import util from '../../util/common';
 import { assert } from 'chai';
-import login from '../../util/common/login';
 import units from './unitElements';
 
-
 describe('Create Unit', () => {
-  createManageUnitTest('unit.test.name');
-  createManageUnitTest('unit.test.abv');
-  createManageUnitTest('dimensionName');
-  createManageUnitTest('');
-});
 
-it('should login', async () => {
-  // open a new tab
-  const page = await Browser.openTab();
+  // after finishing the testing, delete the created unit
+  after(async () => {
 
-  // ensure a normal user is logged in
-  await login.loginUser(page);
-  await Browser.closeTabs();
+    await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'unit.test.desc'), 'should delete the created unit');
+  });
+
+  createUnitTest('unit.test.name');
+  createUnitTest('unit.test.abv');
+  createUnitTest('dimensionName');
+
+  it('should create a new unit', async () => {
+
+    await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
+  });
 });
 
 /**
@@ -27,7 +27,7 @@ it('should login', async () => {
  * @param   {String}    skipped     field to be left empty
  */
 
-async function createManageUnitTest(skipped) {
+async function createUnitTest(skipped) {
   it(`should show an error when missing ${skipped}`, async () => {
 
     const page = await Browser.openTab();
@@ -56,6 +56,7 @@ async function createManageUnitTest(skipped) {
     if (!('unit.test.abv' == skipped)) {
       await assert.isFulfilled(page.type('#Unit_Abbreviation', 'unit.test.abv'), 'should enter an abbreviation');
     }
+
     // find Description field
     await assert.isFulfilled(page.type('#Unit_Description', 'unit.test.desc'), 'should enter a description');
 
@@ -70,16 +71,11 @@ async function createManageUnitTest(skipped) {
     // click save button and wait for the navigation
     await Promise.all([
       page.waitForNavigation(),
-      assert.isFulfilled(page.click('#saveButton'), 'should save the new unit'),
+      assert.isFulfilled(page.click('#saveButton'), 'should fail to save the unit'),
     ]);
 
-    // fill all the fields
-    if (!('' == skipped)) {
-      await Promise.all([
-        page.waitForNavigation(),
-        assert.isFulfilled(page.click('#UintWindow > div.t-window-titlebar.t-header > div > a > span'), 'should close the create unit page'),
-      ]);
-    }
+    // close the create unit form
+    await assert.isFulfilled(page.click('#UintWindow > div.t-window-titlebar.t-header > div > a > span'), 'should close the create unit page'),
 
     // wait until the table is loaded in view mode
     await assert.isFulfilled(page.waitForSelector('#bx-rpm-unitGrid > table > tbody > tr', { visible: true }), ' should wait for the table');
