@@ -8,7 +8,7 @@ describe('Create Unit', () => {
   // after finishing the testing, delete the created unit
   after(async () => {
 
-    await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'unit.test.desc'), 'should delete the created unit');
+    await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
   });
 
   createUnitTest('unit.test.name');

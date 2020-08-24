@@ -13,21 +13,6 @@ describe('Delete Unit', () => {
 
   deleteUnitTest('cancel');
   deleteUnitTest('confirm');
-
-  //TODO: Add this functionality to Lock Unit by Variable
-  it('should not delete the unit in use', async () => {
-
-    const page = await Browser.openTab();
-
-    // navigate to "Manage Units"
-    await assert.isFulfilled(util.menu.select(page, 'Manage Units'), 'should open manage units page');
-
-    // wait until the container is loaded in view mode
-    await assert.isFulfilled(page.waitForSelector('#information-container', { visible: true }), 'wait for manage units page');
-
-    // click a disabled button
-    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr:nth-child(5) > td:nth-child(8) > div > div.bx.bx-grid-function.bx-trash.bx-disabled'), 'should click a disabled delete button');
-  });
 });
 
 /**
@@ -42,7 +27,7 @@ async function deleteUnitTest(action) {
     const page = await Browser.openTab();
 
     // filter unit description in the table
-    await assert.isFulfilled(units.filterDescription(page, util, 'unit.test.desc'), 'should filter the unit description');
+    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
 
     // after clicking delete icon alert box is shown -> click Cancel
     if ('cancel' == action) {
@@ -58,12 +43,12 @@ async function deleteUnitTest(action) {
     await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr > td:nth-child(8) > div > a.bx.bx-grid-function.bx-trash'), 'should click the delete icon');
 
     // filter unit description in the table, after the deletion process
-    await assert.isFulfilled(units.filterDescription(page, util, 'unit.test.desc'), 'should filter the unit description');
+    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
 
     // get the table content
     const tableContent = await units.returnTableContent(page);
 
-    let elementContent = (content) => {
+    const elementContent = (content) => {
       return tableContent.includes(content);
     };
 

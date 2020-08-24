@@ -19,27 +19,30 @@ export default {
  *
  * @param {Object} page
  * @param {Object} util
+ * @param {string} navigation
+ * @param {string} containerId
+ * @param {string} id
  * @param {string} descName
  */
-async function filterDescription(page, util, descName) {
+async function filterDescription(page, util, navigation, containerId, id, descName) {
 
   // navigate to "Manage Units"
-  await util.menu.select(page, 'Manage Units');
+  await util.menu.select(page, navigation);
 
   // wait until the container is loaded in view mode
-  await page.waitForSelector('#information-container', { visible: true });
+  await page.waitForSelector(containerId, { visible: true });
 
   // click the filter button in the Description column
-  await page.click('#bx-rpm-unitGrid > table > thead > tr > th:nth-child(7) > div');
+  await page.click(`${id} > table > thead > tr > th:nth-child(7) > div`);
 
   // enter description of the unit into first input area on the dropdown
-  await page.type('#bx-rpm-unitGrid > div.t-animation-container > div > input[type=text]:nth-child(4)', descName);
+  await page.type(`${id} > div.t-animation-container > div > input[type=text]:nth-child(4)`, descName);
 
   // click the Filter button on the dropdown for finding the unit
-  await page.click('#bx-rpm-unitGrid > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button');
+  await page.click(`${id} > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button`);
 
   // wait until the container is loaded in view mode
-  await page.waitForSelector('#information-container', { visible: true });
+  await page.waitForSelector(containerId, { visible: true });
 }
 
 /**
@@ -164,13 +167,16 @@ async function createUnit(Browser, util, units, assert, descName) {
  * @param {Object} Browser
  * @param {Object} units
  * @param {Object} util
+ * @param {string} navigation
+ * @param {string} containerId
+ * @param {string} id
  * @param {string} descName
  */
-async function deleteUnit(Browser, units, util, descName) {
+async function deleteUnit(Browser, units, util, navigation, containerId, id, descName) {
   const page = await Browser.openTab();
 
   // filter unit description in the table
-  await units.filterDescription(page, util, descName);
+  await units.filterDescription(page, util, navigation, containerId, id, descName);
 
   // after clicking delete icon alert box is shown -> click Ok
   page.on('dialog', async dialog => { await dialog.accept(); });

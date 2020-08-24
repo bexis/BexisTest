@@ -14,7 +14,7 @@ describe('Edit Unit', () => {
   // after finishing the testing, delete the created unit
   after( async () => {
 
-    await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'unit.test.desc'), 'should delete the created unit');
+    await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
   });
 
   it('should edit the unit', async () => {
@@ -22,7 +22,7 @@ describe('Edit Unit', () => {
     const page = await Browser.openTab();
 
     // filter unit description in the table
-    await assert.isFulfilled(units.filterDescription(page, util, 'unit.test.desc'), 'should filter the unit description');
+    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
 
     // click the Edit icon
     await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr:nth-child(1) > td:nth-child(8) > div > a.bx.bx-grid-function.bx-edit'), 'should click the edit icon');
