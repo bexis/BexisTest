@@ -26,18 +26,18 @@ describe( 'Check after migration', () => {
 
   for (let index = 0; index < 1400; index++) {
 
-    getMetadataB1andB2( all_ids[index] );
+    // getMetadataB1andB2( all_ids[index] );
     //  getRelationshipsAndPermissions ( all_ids[index] );
-    checkEntityLinks( all_ids[index] );
+    // checkEntityLinks( all_ids[index] );
     // checkMetadata ( all_ids[index] ); // requires getMetadata
     // checkPermissions ( all_ids[index] ); // requires getMetadata and getRelationshipsAndPermissions
   }
   //  12161;
   //  25506;
-  var test_id = 22346;
-  // getMetadataB1andB2( test_id);
+  var test_id = 15626;
+  getMetadataB1andB2( test_id);
   //getRelationshipsAndPermissions ( 6320 );
-  //checkEntityLinks (test_id);
+  checkEntityLinks (test_id);
   //checkMetadata ( test_id ); // requires getMetadata
   //checkPermissions ( 6320 ); // requires getMetadata and getRelationshipsAndPermissions
 
@@ -125,10 +125,8 @@ async function checkMetadata(id){
 
     if (dataset_b1 != []){
       for (let index = 0; index < dataset_b1.length; index++) {
-        let result = all_ids.filter(function (e) {
-          return e == dataset_b1[index];
-        });
-        if (result){
+        let result = all_ids.find(dataset_b1[index]);
+        if (result-length == 0) {
           dataset_b1[index] = dataset_b1[index] + '_maybe_archived';
         }
       }
@@ -205,7 +203,7 @@ async function checkEntityLinks(id){
         let result = all_ids.filter(function (e) {
           return e == dataset_b1[index];
         });
-        if (result){
+        if (result.length == 0){
           dataset_b1[index] = dataset_b1[index] + '_maybe_archived';
         }
       }
