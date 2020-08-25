@@ -94,7 +94,7 @@ async function returnTable_structured_BEXIS1( page ) {
    * @param {Object} page
    */
 async function returnTable_metadata_BEXIS1( page ) {
-  return await returnTable_BEXIS1( page , 'ctl00_ContentPlaceHolder_Main_Label_metadataContent');
+  return await returnTable_BEXIS1( page , 'content #ctl00_ContentPlaceHolder_Main_Label_metadataContent');
 }
 
 /**
