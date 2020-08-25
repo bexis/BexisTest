@@ -1,7 +1,7 @@
 /**
  * handle find certain elements
  */
-
+import { assert } from 'chai';
 
 export default {
   itemNumber_Telerik,
@@ -17,7 +17,8 @@ export default {
   filterTable_Telerik,
   filterTable_Telerik2,
   extractFirstRowNthColumnValue_Telerik,
-  returnSelectContent
+  returnSelectContent,
+  sortTable
 };
 
 
@@ -112,7 +113,7 @@ async function returnMetadataValueContent( page ) {
 }
 
 /**
- * Find lable element by text and click on it
+ * Find label element by text and click on it
  *
  * @param {{ $x: (arg0: string) => any; }} page
  * @param {string} text
@@ -164,6 +165,8 @@ async function findTableRowByTableCellText(page, text){
  */
 async function filterTable_Telerik(page, filterText){
 
+  await page.waitForSelector( '#divResultGrid > div > table > thead > tr > th:nth-child(1) > div', { visible: true });
+
   await page.click( '#divResultGrid > div > table > thead > tr > th:nth-child(1) > div' );
 
   await page.waitForSelector(  '.t-clear-button', { visible: true });
@@ -188,19 +191,24 @@ async function filterTable_Telerik(page, filterText){
 async function filterTable_Telerik2(page, filterText, pos, id, id_text){
 
   // search for filter and open
-  await page.click( '#' + id +' > div > table > thead > tr > th:nth-child(' + pos + ') > div' );
+  await assert.isFulfilled(page.click( '#' + id +' > div > table > thead > tr > th:nth-child(' + pos + ') > div' ), 'open filter');
 
+  page.waitFor(2000);
   // wait until filter form is open
-  await page.waitForSelector(  '#' + id + ' .t-clear-button', { visible: true });
+  await assert.isFulfilled( page.waitForSelector(  '#' + id + ' .t-clear-button', { visible: true }), 'wait for open filter');
 
+  await assert.isFulfilled( page.click (id_text, { clickCount: 3}), 'delete previous filter text');
   // fill first text field with search string
-  await page.type(id_text , filterText);
+  await assert.isFulfilled( page.type(id_text , filterText), 'add filter text');
 
   // filter
-  await page.click(  '#' + id + ' .t-filter-button' );
+  await page.focus('#' + id + ' .t-filter-button' );
+  await page.keyboard.type('\n');
+  page.waitFor(2000);
 
   // wait for result table
-  await page.waitForSelector( '.t-status-text', { visible: true });
+  await assert.isFulfilled( page.waitForSelector( '.t-status-text', { visible: true }), 'wait table is loaded');
+
 }
 
 /**
@@ -231,4 +239,27 @@ async function returnSelectContent( page) {
     return Array.from(rows, row => row.textContent);
   });
   return result;
+}
+
+
+/**
+ * Sort table by given row number
+ *
+ * @param {Object} page
+ * @param {string} rowNumber
+ */
+async function sortTable ( page , rowNumber){
+
+  // Add class to identify changed table content
+  await page.evaluate(() => {
+    document.querySelectorAll('#PrimaryDataResultGrid > table > tbody > tr:nth-child(1)')[0].classList.add('show_table');
+  });
+
+  // Filter by first column
+  await assert.isFulfilled( page.click('#PrimaryDataResultGrid > table > thead > tr:nth-child(1) > th:nth-child('+rowNumber+') > a:nth-child(1)'), 'click first row to sort')
+  ;
+
+  // Wait until added class is removed -> replace by new content
+  await assert.isFulfilled( page.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
+
 }
