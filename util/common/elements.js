@@ -252,8 +252,7 @@ async function clearInputField(page, selector) {
   await page.evaluate(selector => {
     document.querySelector(selector).value = '';
   }, selector);
-}}
-
+}
 
 /**
  * Sort table by given row number
