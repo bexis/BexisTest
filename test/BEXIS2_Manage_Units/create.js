@@ -5,7 +5,7 @@ import units from './unitElements';
 
 describe('Create Unit', () => {
 
-  // after finishing the testing, delete the created unit
+  // after finishing the test, delete the created unit
   after(async () => {
 
     await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
@@ -42,7 +42,7 @@ async function createUnitTest(skipped) {
     const rowCountBefore = (await page.$$('#bx-rpm-unitGrid > table > tbody > tr')).length;
 
     // click Create Unit button
-    await assert.isFulfilled(page.click('.bx-button'), 'should click Create Unit button');
+    await assert.isFulfilled(page.click('.bx-button'), 'should click create unit button');
 
     // wait until the unit window is loaded in view mode
     await assert.isFulfilled(page.waitForSelector('#UintWindow', { visible: true }), 'wait for create unit form');
@@ -86,7 +86,7 @@ async function createUnitTest(skipped) {
     // find difference between rows
     const diffRows = rowCountAfter - rowCountBefore;
 
-    // checks if a new entry is added or not
+    // check if a new entry is added or not
     if (diffRows === 0) {
       assert.equal(rowCountBefore, rowCountAfter, 'No new entry is added');
     } else if (diffRows === 1) {

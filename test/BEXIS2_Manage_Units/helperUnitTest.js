@@ -1,7 +1,7 @@
 import login from '../../util/common/login';
 import Browser from '../../util/Browser';
 
-before(function() {
+before(() => {
   it('should login', async () => {
     // open a new tab
     const page = await Browser.openTab();

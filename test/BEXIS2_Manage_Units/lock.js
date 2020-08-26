@@ -3,17 +3,16 @@ import util from '../../util/common';
 import { assert } from 'chai';
 import units from './unitElements';
 
-
 describe('Lock Unit', () => {
 
-  //   before starting the testing, create a new unit
+  // before starting the test, create a new unit
   before(async () => {
 
     await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
   });
 
-  // after finishing the testing, delete the created unit
-  after( async () => {
+  // after finishing the test, delete the created unit
+  after(async () => {
 
     await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
   });
@@ -56,7 +55,7 @@ describe('Lock Unit', () => {
     await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
 
     // check if there is a disabled class on the table or not
-    const disabledButton = await page.evaluate(()=> {
+    const disabledButton = await page.evaluate(() => {
       return (document.querySelector('.bx-disabled') != null) ? true : false;
     });
 
@@ -70,12 +69,12 @@ describe('Lock Unit', () => {
     await assert.isFulfilled(page.waitForSelector('#informationContainer', { visible: true }), 'wait for manage variable templates page');
 
     // filter unit description in the table
-    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Variable Templates', '#informationContainer', '#bx-rpm-attributeGrid','unit.test.desc'), 'should filter the unit description');
+    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Variable Templates', '#informationContainer', '#bx-rpm-attributeGrid', 'unit.test.desc'), 'should filter the unit description');
 
-    // after clicking delete icon alert box is shown -> click Ok
+    // after clicking delete button alert box is shown -> click Ok
     page.on('dialog', async dialog => { await dialog.accept(); });
 
-    // click the Delete button to delete the variable template
+    // click the Delete button
     await assert.isFulfilled(page.click('#bx-rpm-attributeGrid > table > tbody > tr > td:nth-child(8) > div > a.bx.bx-grid-function.bx-trash'), 'should click the delete button');
   });
 });

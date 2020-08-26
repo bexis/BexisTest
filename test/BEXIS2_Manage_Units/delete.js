@@ -5,7 +5,7 @@ import units from './unitElements';
 
 describe('Delete Unit', () => {
 
-  // before starting the testing, create a new unit
+  // before starting the test, create a new unit
   before(async () => {
 
     await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
@@ -29,18 +29,18 @@ async function deleteUnitTest(action) {
     // filter unit description in the table
     await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
 
-    // after clicking delete icon alert box is shown -> click Cancel
+    // after clicking delete button. alert box is shown -> click Cancel
     if ('cancel' == action) {
       page.on('dialog', async dialog => { await dialog.dismiss(); });
     }
 
-    // after clicking delete icon alert box is shown -> click Ok
+    // after clicking delete button, alert box is shown -> click Ok
     if ('confirm' == action) {
       page.on('dialog', async dialog => { await dialog.accept(); });
     }
 
-    // click the Delete icon to delete the unit
-    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr > td:nth-child(8) > div > a.bx.bx-grid-function.bx-trash'), 'should click the delete icon');
+    // click the Delete button
+    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr > td:nth-child(8) > div > a.bx.bx-grid-function.bx-trash'), 'should click the delete button');
 
     // filter unit description in the table, after the deletion process
     await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');

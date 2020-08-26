@@ -2,18 +2,18 @@ import Browser from '../../util/Browser';
 import util from '../../util/common';
 import { assert } from 'chai';
 import units from './unitElements';
-
+import elements from '../../util/common/elements';
 
 describe('Duplicate Unit', () => {
 
-  // before starting the testing, create a new unit
-  before( async () => {
+  // before starting the test, create a new unit
+  before(async () => {
     await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
 
   });
 
-  // after finishing the testing, delete the created unit
-  after( async () => {
+  // after finishing the test, delete the created unit
+  after(async () => {
 
     await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
   });
@@ -58,7 +58,7 @@ describe('Duplicate Unit', () => {
     assert.isTrue(isVisible, 'Create unit form should be visible due to duplication.');
   });
 
-  it('should not edit duplicate name and abbreviation', async () => {
+  it('should not edit due to duplicate name', async () => {
 
     const page = await Browser.openTab();
 
@@ -91,13 +91,10 @@ describe('Duplicate Unit', () => {
     await assert.isFulfilled(page.waitForSelector('#UintWindow', { visible: true }), 'wait for create unit form');
 
     // clears Name input field
-    await units.clearInputField(page, '#Unit_Name');
+    await elements.clearInputField(page, '#Unit_Name');
 
     // type name of the first unit on the table that already exists
     await assert.isFulfilled(page.type('#Unit_Name', tagContent[2].toString()), 'should enter a name');
-
-    // choose a Dimesion Name
-    await assert.isFulfilled(units.chooseDimensionName(page), 'should choose a new dimension name');
 
     // click save button
     await Promise.all([

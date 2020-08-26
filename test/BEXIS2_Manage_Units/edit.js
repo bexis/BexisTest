@@ -5,14 +5,14 @@ import units from './unitElements';
 
 describe('Edit Unit', () => {
 
-  // before starting the testing, create a new unit
+  // before starting the test, create a new unit
   before(async () => {
 
     await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
   });
 
-  // after finishing the testing, delete the created unit
-  after( async () => {
+  // after finishing the test, delete the created unit
+  after(async () => {
 
     await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
   });
@@ -24,17 +24,17 @@ describe('Edit Unit', () => {
     // filter unit description in the table
     await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
 
-    // click the Edit icon
-    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr:nth-child(1) > td:nth-child(8) > div > a.bx.bx-grid-function.bx-edit'), 'should click the edit icon');
+    // click the Edit button
+    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr:nth-child(1) > td:nth-child(8) > div > a.bx.bx-grid-function.bx-edit'), 'should click the edit button');
 
     // wait until the unit window is loaded in view mode
     await assert.isFulfilled(page.waitForSelector('#UintWindow', { visible: true }), 'wait for create unit form');
 
     // edit Name
-    await assert.isFulfilled(page.type('#Unit_Name', 'new.'), 'should edit a name');
+    await assert.isFulfilled(page.type('#Unit_Name', 'new.'), 'should edit the name');
 
     // edit Abbreviation
-    await assert.isFulfilled(page.type('#Unit_Abbreviation', 'new.'), 'should edit an abbreviation');
+    await assert.isFulfilled(page.type('#Unit_Abbreviation', 'new.'), 'should edit the abbreviation');
 
     // choose a Dimesion Name
     await assert.isFulfilled(units.chooseDimensionName(page), 'should choose a new dimension name');

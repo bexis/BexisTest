@@ -17,7 +17,8 @@ export default {
   filterTable_Telerik,
   filterTable_Telerik2,
   extractFirstRowNthColumnValue_Telerik,
-  returnSelectContent
+  returnSelectContent,
+  clearInputField
 };
 
 
@@ -231,4 +232,16 @@ async function returnSelectContent( page) {
     return Array.from(rows, row => row.textContent);
   });
   return result;
+}
+
+/**
+ * Clear an Input field
+ *
+ * @param {Object} page to work upon
+ * @param {string} selector element selector
+ */
+async function clearInputField(page, selector) {
+  await page.evaluate(selector => {
+    document.querySelector(selector).value = '';
+  }, selector);
 }

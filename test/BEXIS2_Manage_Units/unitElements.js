@@ -4,98 +4,17 @@
 
 
 export default {
+  createUnit,
+  deleteUnit,
   filterDescription,
   chooseDimensionName,
   chooseDataType,
-  createUnit,
-  deleteUnit,
-  returnTableContent,
-  clearInputField
+  returnTableContent
 };
 
 
 /**
- * Filter the unit by Description name
- *
- * @param {Object} page
- * @param {Object} util
- * @param {string} navigation
- * @param {string} containerId
- * @param {string} id
- * @param {string} descName
- */
-async function filterDescription(page, util, navigation, containerId, id, descName) {
-
-  // navigate to "Manage Units"
-  await util.menu.select(page, navigation);
-
-  // wait until the container is loaded in view mode
-  await page.waitForSelector(containerId, { visible: true });
-
-  // click the filter button in the Description column
-  await page.click(`${id} > table > thead > tr > th:nth-child(7) > div`);
-
-  // enter description of the unit into first input area on the dropdown
-  await page.type(`${id} > div.t-animation-container > div > input[type=text]:nth-child(4)`, descName);
-
-  // click the Filter button on the dropdown for finding the unit
-  await page.click(`${id} > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button`);
-
-  // wait until the container is loaded in view mode
-  await page.waitForSelector(containerId, { visible: true });
-}
-
-/**
- * Choose a Dimension Name and a Measurement System
- *
- * @param {Object} page
- */
-async function chooseDimensionName(page) {
-
-  // random number gerenerator for Dimension Name
-  const randomDimName = Math.floor(Math.random() * 38) + 1;
-
-  // random number gerenerator for Measurment System
-  const randomMeasure = Math.floor(Math.random() * (6 - 2)) + 2;
-
-  // click dropdown menu for Dimension Name menu
-  await page.click('#createUnit > form > table > tbody > tr:nth-child(4) > td:nth-child(2) > div > div > span');
-
-  // choose a random Dimension Name value
-  await page.click(`body > div.t-animation-container > div > ul > li:nth-child(${randomDimName})`);
-
-  // click dropdown menu for Measurement System menu
-  await page.click('#createUnit > form > table > tbody > tr:nth-child(6) > td:nth-child(2) > div > div');
-
-  // there are more than one of the same class name -> choose the first selector
-  const selectors = await page.$$(`body > div.t-animation-container > div > ul > li:nth-child(${randomMeasure})`);
-
-  // choose a random Measurement System value
-  await selectors[1].click();
-}
-
-/**
- * Choose a Data Type
- *
- * @param {Object} page
- */
-async function chooseDataType(page) {
-
-  // random number gerenerator for Data Type
-  const randomDataType = Math.floor(Math.random() * 7) + 1;
-
-  // uncheck the chekboxes
-  await page.$$eval('input[type="checkbox"]',
-                    checkBoxes => checkBoxes
-                      .forEach(checkBox => checkBox.checked = false));
-
-  // choose a random Data Type
-  await page.click(`#bx-rpm-selectDataTypeGrid > div.t-grid-content > table > tbody > tr:nth-child(${randomDataType}) > td:nth-child(1) > input`);
-}
-
-
-/**
- * create a test for Manage Units with required field not filled until all fields filled
+ * Create unit
  *
  * @param   {object}    Browser
  * @param   {object}    util
@@ -161,6 +80,7 @@ async function createUnit(Browser, util, units, assert, descName) {
   }
 }
 
+
 /**
  * Delete unit
  *
@@ -172,6 +92,7 @@ async function createUnit(Browser, util, units, assert, descName) {
  * @param {string} id
  * @param {string} descName
  */
+
 async function deleteUnit(Browser, units, util, navigation, containerId, id, descName) {
   const page = await Browser.openTab();
 
@@ -185,6 +106,92 @@ async function deleteUnit(Browser, units, util, navigation, containerId, id, des
   await page.click('#bx-rpm-unitGrid > table > tbody > tr > td:nth-child(8) > div > a.bx.bx-grid-function.bx-trash');
 }
 
+
+/**
+ * Filter a unit by Description name
+ *
+ * @param {Object} page
+ * @param {Object} util
+ * @param {string} navigation
+ * @param {string} containerId
+ * @param {string} id
+ * @param {string} descName
+ */
+
+async function filterDescription(page, util, navigation, containerId, id, descName) {
+
+  // navigate to "Manage Units"
+  await util.menu.select(page, navigation);
+
+  // wait until the container is loaded in view mode
+  await page.waitForSelector(containerId, { visible: true });
+
+  // click the filter button in the Description column
+  await page.click(`${id} > table > thead > tr > th:nth-child(7) > div`);
+
+  // enter description of the unit into first input area on the dropdown
+  await page.type(`${id} > div.t-animation-container > div > input[type=text]:nth-child(4)`, descName);
+
+  // click the Filter button on the dropdown for finding the unit
+  await page.click(`${id} > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button`);
+
+  // wait until the container is loaded in view mode
+  await page.waitForSelector(containerId, { visible: true });
+}
+
+
+/**
+ * Choose a Dimension Name and a Measurement System
+ *
+ * @param {Object} page
+ */
+
+async function chooseDimensionName(page) {
+
+  // random number gerenerator for Dimension Name
+  const randomDimName = Math.floor(Math.random() * 38) + 1;
+
+  // random number gerenerator for Measurment System
+  const randomMeasure = Math.floor(Math.random() * (6 - 2)) + 2;
+
+  // click dropdown menu for Dimension Name menu
+  await page.click('#createUnit > form > table > tbody > tr:nth-child(4) > td:nth-child(2) > div > div > span');
+
+  // choose a random Dimension Name value
+  await page.click(`body > div.t-animation-container > div > ul > li:nth-child(${randomDimName})`);
+
+  // click dropdown menu for Measurement System menu
+  await page.click('#createUnit > form > table > tbody > tr:nth-child(6) > td:nth-child(2) > div > div');
+
+  // there are more than one of the same class name -> choose the first selector
+  const selectors = await page.$$(`body > div.t-animation-container > div > ul > li:nth-child(${randomMeasure})`);
+
+  // choose a random Measurement System value
+  await selectors[1].click();
+}
+
+
+/**
+ * Choose a Data Type
+ *
+ * @param {Object} page
+ */
+
+async function chooseDataType(page) {
+
+  // random number gerenerator for Data Type
+  const randomDataType = Math.floor(Math.random() * 7) + 1;
+
+  // uncheck the chekboxes
+  await page.$$eval('input[type="checkbox"]',
+                    checkBoxes => checkBoxes
+                      .forEach(checkBox => checkBox.checked = false));
+
+  // choose a random Data Type
+  await page.click(`#bx-rpm-selectDataTypeGrid > div.t-grid-content > table > tbody > tr:nth-child(${randomDataType}) > td:nth-child(1) > input`);
+}
+
+
 /**
  * Return table content
  *
@@ -196,16 +203,4 @@ async function returnTableContent(page) {
     return Array.from(rows, row => row.textContent);
   });
   return result;
-}
-
-/**
- * Clear an Input field
- *
- * @param {Object} page
- * @param {string} selector
- */
-async function clearInputField(page, selector) {
-  await page.evaluate(selector => {
-    document.querySelector(selector).value = '';
-  }, selector);
 }
