@@ -24,20 +24,21 @@ describe( 'Check after migration', () => {
   // checkVersions(unstructured_dataset_ids[randomIDpos]);
   //checkVersions ( 5000 );
 
-  for (let index = 0; index < 1400; index++) {
-
-    // getMetadataB1andB2( all_ids[index] );
+  for (let index = 800; index < 1400; index++) {
+    getDatasetlistB1();
+    getMetadataB1andB2( all_ids[index] );
     //  getRelationshipsAndPermissions ( all_ids[index] );
-    // checkEntityLinks( all_ids[index] );
+    checkEntityLinks( all_ids[index] );
     // checkMetadata ( all_ids[index] ); // requires getMetadata
     // checkPermissions ( all_ids[index] ); // requires getMetadata and getRelationshipsAndPermissions
   }
   //  12161;
   //  25506;
-  var test_id = 15626;
-  getMetadataB1andB2( test_id);
+  // var test_id = 21766;
+  //getDatasetlistB1();
+  // getMetadataB1andB2( test_id);
   //getRelationshipsAndPermissions ( 6320 );
-  checkEntityLinks (test_id);
+  // checkEntityLinks (test_id);
   //checkMetadata ( test_id ); // requires getMetadata
   //checkPermissions ( 6320 ); // requires getMetadata and getRelationshipsAndPermissions
 
@@ -76,6 +77,8 @@ var dataset_b1 = [];
 
 var warning;
 var permissons_per_dataset = [];
+
+let datasetOverview = new Array();
 
 /**
  * Check amount of versions
@@ -193,19 +196,43 @@ async function checkMetadata(id){
 
 async function checkEntityLinks(id){
 
-  it(id + ' - check paper and links', async () => {
-    assert.deepEqual( paper, [], 'should be empty, if all paper are linked');
-  });
 
   it(id + ' - check linked datasets', async () => {
+
     if (dataset_b1 != []){
+      let notArchiveddatasetOverview = datasetOverview.filter(element => element.archived == false);
+
       for (let index = 0; index < dataset_b1.length; index++) {
+
+        dataset_b1[index] = datasetOverview.find(element => element.id == dataset_b1[index]);
+
+        // calculate levenstein distance
+        let distance = notArchiveddatasetOverview;
+        for (let i = 0; i < notArchiveddatasetOverview.length; i++) {
+          distance[i].value = getEditDistance(notArchiveddatasetOverview[i].title,dataset_b1[index].title);
+        }
+
+        distance.sort((a,b) => a.value - b.value );
+
+        dataset_b1[index].suggestion1 =JSON.stringify(distance[0]);
+        dataset_b1[index].suggestion2 =JSON.stringify(distance[1]);
+        dataset_b1[index].suggestion3 =JSON.stringify(distance[2]);
+        dataset_b1[index].suggestion4 =JSON.stringify(distance[3]);
+        dataset_b1[index].suggestion5 =JSON.stringify(distance[4]);
+        dataset_b1[index].suggestion6 =JSON.stringify(distance[5]);
+        dataset_b1[index].suggestion7 =JSON.stringify(distance[6]);
+
+        /**
         let result = all_ids.filter(function (e) {
           return e == dataset_b1[index];
         });
         if (result.length == 0){
           dataset_b1[index] = dataset_b1[index] + '_maybe_archived';
         }
+        else {
+          dataset_b1[index] = dataset_b1[index] + '_exist_not_linked';
+        }
+        */
       }
     }
 
@@ -238,7 +265,14 @@ async function checkEntityLinks(id){
         }
       }
     }
-    assert.deepEqual([dataset_b1, double_links, links], [], 'Archived & double links & diff' );
+
+    let compare = [];
+    compare['Datasets not found'] = dataset_b1;
+    compare['Paper not found'] = paper;
+    compare['Duplicate links'] = double_links;
+    compare['Other links'] = links;
+    console.log(compare); // print result
+    // assert.equal(compare, null, 'Archived & double links & diff' );
 
   });
 }
@@ -294,6 +328,185 @@ async function checkPermissions( id ){
     assert.deepEqual(permission_ok, permission_b1,  'should be the same');
   });
 
+}
+
+async function getDatasetlistB1(){
+  it('get dataset list from B1', async () => {
+
+    const fs = require('fs');
+
+    // read JSON object from file
+    fs.readFile('overview.json', 'utf-8', (err, data) => {
+      if (err) {
+        throw err;
+      }
+
+      // parse JSON object
+      datasetOverview = JSON.parse(data.toString());
+    });
+    /**
+    // open tab in BEXIS 1
+    const page2 = await Browser.openTab(true);
+
+    // ensure user is logged in BEXIS 1
+    await bexis1.checkAndLoginUser_BEXIS1 ( page2 );
+
+    // navigate to show data page for unstructured data
+    await assert.isFulfilled( page2.goto( Config.browser2.baseURL + '/Upload/Upload.aspx'), 'should open show data page for metadata' );
+
+    // add class to table to have something to check, if the table was replaced by new content
+    await page2.evaluate(() => {
+      document.querySelectorAll('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_GridView_Datasets')[0].classList.add('show_table');
+    });
+
+    // click 50
+    await assert.isFulfilled( elements.clickElementByLinkText(page2, '50'), 'Change page size');
+
+    // wait for the new result (ready, when the added class disappeared)
+    await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
+    let page_content = await bexis1.returnTable_ds_overview__BEXIS1(page2);
+    let page_content_html = await returnTable_BEXIS1( page2 , 'ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_GridView_Datasets');
+
+    await addContent(page_content, page_content_html);
+
+    let first = false;
+    let start_index = 1;
+    do {
+      if (first == true){start_index = 3;}
+      const end_index = page_content[page_content.length-1].length-1;
+      for (let index = start_index; index < end_index; index++) {
+        first = true;
+        console.log(index);
+        console.log(page_content[page_content.length-1]);
+        const element = page_content[page_content.length-1][index];
+        await page2.evaluate(() => {
+          document.querySelectorAll('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_GridView_Datasets')[0].classList.add('show_table');
+        });
+
+        page2.waitFor(2000);
+        // click 50
+        console.log(element);
+        const ele = await page2.$x('//a[text() ="'+element+'"]');
+        if (['10', '20', '50'].includes(element) || (end_index == 13 && element == '...')){
+          await (await ele[1].asElement()).click();
+        }
+        else{
+          await (await ele[0].asElement()).click();
+        }
+        // wait for the new result (ready, when the added class disappeared)
+        await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
+        page_content = await bexis1.returnTable_ds_overview__BEXIS1(page2);
+        let page_content_html = await returnTable_BEXIS1( page2 , 'ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_GridView_Datasets');
+
+        await addContent(page_content, page_content_html);
+      }
+    }
+    while (page_content[page_content.length-1][page_content[page_content.length-1].length-1] == '>>');
+
+    if (first == true){start_index = 3;}
+    const end_index = page_content[page_content.length-1].length;
+    for (let index = start_index; index < end_index; index++) {
+      first = true;
+      console.log(index);
+      console.log(page_content[page_content.length-1]);
+      const element = page_content[page_content.length-1][index];
+      await page2.evaluate(() => {
+        document.querySelectorAll('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_GridView_Datasets')[0].classList.add('show_table');
+      });
+
+      // click 50
+      console.log(element);
+      const ele = await page2.$x('//a[text() ="'+element+'"]');
+      if (['10', '20', '50'].includes(element) || (end_index == 13 && element == '...')){
+        await (await ele[1].asElement()).click();
+      }
+      else{
+        await (await ele[0].asElement()).click();
+      }
+      // wait for the new result (ready, when the added class disappeared)
+      await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
+      page_content = await bexis1.returnTable_ds_overview__BEXIS1(page2);
+      let page_content_html = await returnTable_BEXIS1( page2 , 'ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_GridView_Datasets');
+
+      await addContent(page_content, page_content_html);
+    }
+
+    //console.log(page_content);
+    // console.log(JSON.stringify(datasetOverview));
+    let data = JSON.stringify(datasetOverview);
+    const fs = require('fs');
+    fs.writeFile('overview.json', data, (err) => {
+      if (err) {
+        throw err;
+      }
+      console.log('JSON data is saved.');
+    });
+
+
+    */
+  });
+}
+
+function addContent(page_content, page_content_html){
+
+  let archived;
+  for (let index = 1; index < page_content.length-2; index++) {
+    const element = page_content[index];
+    if ((page_content_html[index][4].match(/checked/g) || []).length > 1){
+      archived = true;
+    }
+    else{
+      archived = false;
+    }
+    datasetOverview.push({id: element[1], title :element[2], archived : archived, date : element[5] });
+  }
+}
+
+async function returnTable_BEXIS1( page , tableId, rowCondition = '') {
+  const result = await page.evaluate((tableId, rowCondition) => {
+    const rows = document.querySelectorAll(`#${tableId} tr`);
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll(`td${rowCondition}`);
+      return Array.from(columns, column => column.innerHTML);
+    });
+  }, tableId, rowCondition);
+
+  return result;
+}
+
+// https://gist.github.com/andrei-m/982927
+function getEditDistance (a, b){
+  if(a.length == 0) return b.length;
+  if(b.length == 0) return a.length;
+
+  var matrix = [];
+
+  // increment along the first column of each row
+  var i;
+  for(i = 0; i <= b.length; i++){
+    matrix[i] = [i];
+  }
+
+  // increment each column in the first row
+  var j;
+  for(j = 0; j <= a.length; j++){
+    matrix[0][j] = j;
+  }
+
+  // Fill in the rest of the matrix
+  for(i = 1; i <= b.length; i++){
+    for(j = 1; j <= a.length; j++){
+      if(b.charAt(i-1) == a.charAt(j-1)){
+        matrix[i][j] = matrix[i-1][j-1];
+      } else {
+        matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
+                                Math.min(matrix[i][j-1] + 1, // insertion
+                                         matrix[i-1][j] + 1)); // deletion
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
 }
 
 
@@ -391,7 +604,6 @@ async function getMetadataB1andB2(id){
 
       }
     });
-
 
     // open tab in BEXIS 2
     const page = await Browser.openTab();
