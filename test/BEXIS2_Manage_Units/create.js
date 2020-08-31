@@ -7,7 +7,6 @@ describe('Create Unit', () => {
 
   // after finishing the test, delete the created unit
   after(async () => {
-
     await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
   });
 
@@ -17,7 +16,16 @@ describe('Create Unit', () => {
 
   it('should create a new unit', async () => {
 
-    await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    // add unit
+    await assert.isFulfilled(units.createUnit(page, util, units, assert, 'unit.test.desc'), 'should create a new unit');
+
   });
 });
 
@@ -32,14 +40,16 @@ async function createUnitTest(skipped) {
 
     const page = await Browser.openTab();
 
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
     // navigate to "Manage Units"
     await assert.isFulfilled(util.menu.select(page, 'Manage Units'), 'should open manage units page');
 
     // wait until the container is loaded in view mode
     await assert.isFulfilled(page.waitForSelector('#information-container', { visible: true }), 'wait for manage units page');
-
-    // count the number of rows before a new entry
-    const rowCountBefore = (await page.$$('#bx-rpm-unitGrid > table > tbody > tr')).length;
 
     // click Create Unit button
     await assert.isFulfilled(page.click('.bx-button'), 'should click create unit button');
@@ -49,16 +59,16 @@ async function createUnitTest(skipped) {
 
     // find Name field
     if (!('unit.test.name' == skipped)) {
-      await assert.isFulfilled(page.type('#Unit_Name', 'unit.test.name'), 'should enter a name');
+      await assert.isFulfilled(units.inputType(page, '#Unit_Name', 'unit.test.name'), 'should enter a name');
     }
 
     // find Abbreviation field
     if (!('unit.test.abv' == skipped)) {
-      await assert.isFulfilled(page.type('#Unit_Abbreviation', 'unit.test.abv'), 'should enter an abbreviation');
+      await assert.isFulfilled(units.inputType(page, '#Unit_Abbreviation', 'unit.test.abv'), 'should enter an abbreviation');
     }
 
     // find Description field
-    await assert.isFulfilled(page.type('#Unit_Description', 'unit.test.desc'), 'should enter a description');
+    await assert.isFulfilled(units.inputType(page, '#Unit_Description', 'unit.test.desc'), 'should enter a description');
 
     // choose a value for Dimension Name
     if (!('dimensionName' == skipped)) {
@@ -74,23 +84,13 @@ async function createUnitTest(skipped) {
       assert.isFulfilled(page.click('#saveButton'), 'should fail to save the unit'),
     ]);
 
-    // close the create unit form
-    await assert.isFulfilled(page.click('#UintWindow > div.t-window-titlebar.t-header > div > a > span'), 'should close the create unit page'),
+    // wait until the unit window is loaded in view mode
+    await assert.isFulfilled(page.waitForSelector('#UintWindow', { visible: true }), 'wait for create unit form');
 
-    // wait until the table is loaded in view mode
-    await assert.isFulfilled(page.waitForSelector('#bx-rpm-unitGrid > table > tbody > tr', { visible: true }), ' should wait for the table');
+    // check if the Create Unit form is visible
+    const isVisible = !!(await page.$('#UintWindow'));
 
-    // count the number of rows after a new entry
-    const rowCountAfter = (await page.$$('#bx-rpm-unitGrid > table > tbody > tr')).length;
+    assert.isTrue(isVisible, 'Create unit form should be visible due to duplication.');
 
-    // find difference between rows
-    const diffRows = rowCountAfter - rowCountBefore;
-
-    // check if a new entry is added or not
-    if (diffRows === 0) {
-      assert.equal(rowCountBefore, rowCountAfter, 'No new entry is added');
-    } else if (diffRows === 1) {
-      assert.notEqual(rowCountBefore, rowCountAfter, 'New entry is added');
-    }
   });
 }
