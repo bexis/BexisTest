@@ -101,7 +101,7 @@ function checkVersions(id){
     await assert.isFulfilled( page.goto( Config.browser.baseURL + '/ddm/data/Showdata/' + id ), 'should show dataset view' );
 
     // get options from selection list
-    const result = await common.elements.returnSelectContent( page);
+    const result = await common.elements.returnSelectContent( page, 'VersionSelect');
 
     // get number of versions to check later
     numberOfVersions = result.length;
@@ -129,7 +129,7 @@ async function checkMetadata(id){
     if (dataset_b1 != []){
       for (let index = 0; index < dataset_b1.length; index++) {
         let result = all_ids.find(dataset_b1[index]);
-        if (result-length == 0) {
+        if (result.length == 0) {
           dataset_b1[index] = dataset_b1[index] + '_maybe_archived';
         }
       }

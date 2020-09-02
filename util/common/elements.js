@@ -18,6 +18,8 @@ export default {
   filterTable_Telerik2,
   extractFirstRowNthColumnValue_Telerik,
   returnSelectContent,
+  returnSelectContentAndValue,
+  returnContent,
   sortTable,
   clearInputField
 };
@@ -231,14 +233,45 @@ async function extractFirstRowNthColumnValue_Telerik(page, tableId, nthColumn ){
 
 /**
  * Return table content from telerik table
- *
  * @param {Object} page page to work upon
+ * @param {string} selectID id
  */
-async function returnSelectContent( page) {
-  const result = await page.evaluate(() => {
-    const rows = document.querySelectorAll('#VersionSelect option');
+async function returnSelectContent( page, selectID) {
+  const result =  await page.evaluate((selectID) => {
+    const rows = document.querySelectorAll(`#${selectID} option`);
     return Array.from(rows, row => row.textContent);
+  }, selectID);
+  return result;
+}
+
+/**
+ * @param {object} page page to work upon
+ * @param {string} selectID id
+ */
+async function returnSelectContentAndValue( page, selectID ) {
+  return  page.$eval('#' + selectID , (tab) => {
+    const option = tab.querySelectorAll( 'option' );
+    var result = [];
+    for (let index = 0; index < option.length; index++) {
+      result.push({
+        name:   option[index].textContent,
+        value:  option[index].value,
+      });
+    }
+    return result;
   });
+}
+
+/**
+ * Return content
+ * @param {Object} page page to work upon
+ * @param {string} selector
+ */
+async function returnContent( page, selector) {
+  const result = await page.evaluate((selector) => {
+    const rows = document.querySelectorAll(selector);
+    return Array.from(rows, row => row.textContent);
+  }, selector);
   return result;
 }
 
