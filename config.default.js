@@ -37,6 +37,26 @@ export default {
 
   },
 
+  browser2: {
+
+    // 2nd URL to open at start
+    baseURL: 'http://some.url/',
+
+    // default user
+    userNormal: {
+      userName: 'USERNAME',
+      password: 'PASSWORD',
+    },
+
+    // admin user
+    userAdmin: {
+      userName2: 'USERNAME',
+      password2: 'PASSWORD',
+    },
+
+    // all other settings taken from browser
+  },
+
   /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX GENERAL SETTINGS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
   // default timeout for all actions (in ms); "how long can a page.something() call last at most?"
