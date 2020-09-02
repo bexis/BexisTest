@@ -4,31 +4,41 @@ import login from '../../../util/common/login';
 import elements from '../../../util/common/elements';
 import bexis1 from '../../../util/common/bexis1';
 
+let plotlistB1 = [];
+let plotlistExpB1 = [];
+let plotlistB2;
+
 
 describe( 'Plot charts', () => {
 
-  // check only B1
-  it.skip('B1 get plot charts', async () => {
+  getPLotLists();
+
+});
+
+
+async function getPLotLists(){
+  it('get plotlist in B1% B2', async function() {
+    this.timeout(0);
+
     // open tab
     const page2 = await Browser.openTab(true);
 
     // ensure user is logged in BEXIS 1
     await bexis1.loginUserBEXIS1(page2);
 
-    await page2.goto('https://www.bexis.uni-jena.de/Plotchart/Plotchart.aspx');
+    await page2.goto('https://www.bexis.uni-jena.de/PlotChart/PlotchartExp.aspx');
 
-    // wait for the selection for region or global
     await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_DropDownList_Plotchart', { visible: true }), 'should wait for global / region' );
 
-
-    await page2.select('select#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_DropDownList_Plotchart', 'AEG11');
-
-    await page2.screenshot({path: 'AEG11_B1.png'});
+    plotlistExpB1 =  await elements.returnSelectContentAndValue(page2, 'ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_DropDownList_Plotchart');
 
 
-  });
 
-  it('B2 get plot', async () => {
+    await page2.goto('https://www.bexis.uni-jena.de/Plotchart/Plotchart.aspx');
+
+    await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_DropDownList_Plotchart', { visible: true }), 'should wait for global / region' );
+
+    plotlistB1 =  await elements.returnSelectContentAndValue(page2, 'ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_DropDownList_Plotchart');
 
     // open a new tab in BEXIS 2
     const page = await Browser.openTab();
@@ -40,95 +50,44 @@ describe( 'Plot charts', () => {
 
     await assert.isFulfilled( page.waitForSelector( '#plotlist', { visible: true }), 'should wait for global / region' );
 
-    await page.select('select#plotlist', '329');
+    plotlistB2 = await elements.returnSelectContentAndValue(page, 'plotlist');
+    await page2.evaluate(() => {
+      document.querySelectorAll('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_Panel11')[0].classList.add('show_table');
+    });
+    await elements.clickElementByLabelText(page2, 'include former subplots');
 
+    await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
 
+    await page2.evaluate(() => {
+      document.querySelectorAll('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_Panel11')[0].classList.add('show_table');
+    });
 
-    await page.screenshot({path: 'AEG11_B2.png'});
+    await elements.clickElementByLabelText(page2, 'Draw beyond plot borders');
+    await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
 
+    assert.isFulfilled( page2.waitForSelector( 'ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_Panel11', { visible: true }), 'should wait for global / region' );
+
+    /**   for (let index = 0; index < plotlistB1.length; index++) {
+      await page2.evaluate(() => {
+        document.querySelectorAll('#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_Panel11')[0].classList.add('show_table');
+      });
+
+      await page2.select('select#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_DropDownList_Plotchart', plotlistB1[index].value);
+      await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
+      await page2.waitFor(20);
+      await page2.screenshot({path: 'results/plots/'+ plotlistB1[index].value +'_B1_former_beyond.png'});
+    }*/
+
+    console.log(plotlistB1);
+    for (let index = 0; index < plotlistB1.length; index++) {
+      const plot = plotlistB2.find(o => o.name ===  plotlistB1[index].value);
+      if (plot){
+        await page.select('select#plotlist', plot.value);
+        await page.waitFor(3000);
+        //  await page.waitForNavigation({'waitUntil' : 'networkidle0'});
+        await page.screenshot({path: 'results/plots/'+ plotlistB1[index].value +'_B2.png'});
+      }
+    }
 
   });
-
-});
-
-
-/**
- * Calculate LUI in BEXIS 1
- *
- * @param {import("puppeteer").Page} page2
- * @param {String} type allowed values are: old components set, new components set
- * @param {String} regional_global allwoed values are; regional, global
- * @param {Array} exploratories allowed values are: ALB, HAI, SCH
- * @param {Array} years allowed values are: 2006 to (currently) 2018
- * @param {String} seperate_overall allowed values are: separately or overall
- * @param {String} vip_mip_ep allowed values are: VIPs, MIPs, EPs
- */
-async function calculateLUIBEXIS1 ( page2, type, regional_global, exploratories, years, seperate_overall, vip_mip_ep){
-
-  // navigate to LUI page
-  await assert.isFulfilled( page2.goto( 'https://www.bexis.uni-jena.de/LuiTool/LuiTool.aspx?DatasetId=25086' ), 'should open LUI tool' );
-
-  // replace by text in BEXIS 1
-  if (type == 'new components set'){
-    type = 'New components set';
-  }
-  if (type == 'old components set'){
-    type = 'Old components set';
-  }
-  // select base data
-  await assert.isFulfilled( elements.clickElementByLabelText(page2, type), 'should select input data (old / new)');
-
-  // wait for form relaod after selection
-  await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_RadioButtonList1_RawVsCalc_1', { visible: true }), 'should wait for form reload' );
-
-  // select LUI calculation
-  await assert.isFulfilled( elements.clickElementByLabelText(page2, 'standardized'), 'standardized');
-
-  // wait for the selection for region or global
-  await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_RadioButtonList2_Scale_1', { visible: true }), 'should wait for global / region' );
-
-  // select region / global
-  await assert.isFulfilled( elements.clickElementByLabelText(page2, regional_global), ' Select region or global');
-
-  // wait to select explos
-  await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_CheckBoxList_Explo_2', { visible: true }), 'should wait explo selection' );
-
-  // select explos
-  for (let i=0; i<exploratories.length; i++)
-  {
-    await assert.isFulfilled( elements.clickElementByLabelText(page2, exploratories[i]), 'select explo');
-  }
-
-  // select years
-  for (let i=0; i<years.length; i++)
-  {
-    await assert.isFulfilled( elements.clickElementByLabelText(page2, years[i]), 'select a year');
-  }
-
-  // confirm selection
-  await assert.isFulfilled( page2.click( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_btnConfirmExploYear' ), 'should confirm selection' );
-
-  // if more than 1 years is selceted the output format (seperate or overall) needs to be selected
-  if (years.length > 1){
-    await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_RadioButtonList3_typeOfMean_1', { visible: true }), 'should wait for output format selection' );
-    await assert.isFulfilled( elements.clickElementByLabelText(page2, seperate_overall), 'should select seperatly or overall');
-  }
-
-  // wait for plot selection
-  await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_RadioButtonList4_SelectPlots_2', { visible: true }), 'should wait for plot selection' );
-
-  // select plot aggregation
-  await assert.isFulfilled( elements.clickElementByLabelText(page2, vip_mip_ep), 'select VIPs, MIPs or EPs');
-
-  // wait start LUI calculation
-  await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_btnCalculateLUI', { visible: true }), 'should wait to start LUI calculation' );
-
-  // start LUI calculation
-  await assert.isFulfilled( page2.click( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_btnCalculateLUI' ), 'should select new dataset as base input' );
-
-  // wait result table is shown
-  await assert.isFulfilled( page2.waitForSelector( '#ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_PanelResultLui', { visible: true }), 'should wait for result table' );
-
-  // return LUI value for AEG1
-  return await elements.findTableRowByTableCellText(page2, 'AEG1');
 }
