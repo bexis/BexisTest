@@ -79,13 +79,21 @@ async function getPLotLists(){
     }*/
 
     console.log(plotlistB1);
+
+    await assert.isFulfilled( page.click( '#DeactivePlot' ), 'should select former subplots' );
+    await assert.isFulfilled( page.click( '#BeyondBorder' ), 'should select former subplots' );
+    await assert.isFulfilled( page.waitForSelector( '#plotlist', { visible: true }), 'should wait for global / region' );
+
     for (let index = 0; index < plotlistB1.length; index++) {
       const plot = plotlistB2.find(o => o.name ===  plotlistB1[index].value);
       if (plot){
         await page.select('select#plotlist', plot.value);
         await page.waitFor(3000);
-        //  await page.waitForNavigation({'waitUntil' : 'networkidle0'});
-        await page.screenshot({path: 'results/plots/'+ plotlistB1[index].value +'_B2.png'});
+
+        // start LUI calculation
+
+
+        await page.screenshot({path: 'results/plots/'+ plotlistB1[index].value +'_B2_former_beyond.png'});
       }
     }
 
