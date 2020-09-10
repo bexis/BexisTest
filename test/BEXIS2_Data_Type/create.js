@@ -15,9 +15,8 @@ describe('Create Data Type', () => {
       await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
     }
 
-    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements), 'should delete the new data type');
+    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'data.test.desc'), 'should delete the new data type');
   });
-
 
   it('should not create a new data type -- name field is skipped', async () => {
 
@@ -41,8 +40,11 @@ describe('Create Data Type', () => {
     await assert.isFulfilled(page.waitForSelector('#DataTypeWindow', { visible: true }), 'should wait for data type window');
 
     // find Description field and type a description for a data type
-    const dataTypeDesc = 'data.test.skip';
-    await assert.isFulfilled(page.type('#dataType_Description', dataTypeDesc), 'should enter a data type description');
+    const dataTypeDescName = 'data.test.skip';
+    await assert.isFulfilled(elements.typeInputField(page, '#dataType_Description', 'data.test.skip'), 'should enter a data type description');
+
+    // screenshot of data type window for Description Name
+    await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/dataTypeDescName.png'});
 
     // select a random value for System Type
     await assert.isFulfilled(dataElements.chooseOptionValue(page, '#systemType option', 'systemType'), 'should select a random value for system type');
@@ -55,21 +57,17 @@ describe('Create Data Type', () => {
 
     // check error messages of the data type window
     // should have an error message -> invalid name
-    const hasErrors = await page.evaluate(() => Array.from(document.querySelectorAll('#name > td.bx-errorMsg')).some((el) => el.textContent.trim()));
+    const checkErrMsg = await elements.hasErrors(page, '#name > td.bx-errorMsg');
+    assert.isTrue(checkErrMsg, 'should show an error - invalid name');
 
-    assert.isTrue(hasErrors, 'should show an error - invalid name');
+    // check for an entry by Description Name in the list of data types
+    const checkEntry = await elements.hasEntry(page, '#bx-rpm-dataTypeGrid > table > tbody > tr', dataTypeDescName, '5');
+    assert.isFalse(checkEntry, 'should not contain the new data type in the table');
 
-    // check for the new entry in the list of data types
-    const hasDataType = await page.$$eval('#bx-rpm-dataTypeGrid > table > tbody > tr', (rows, dataTypeDesc) => {
-      return rows.some((tr) => tr.querySelector('td:nth-child(5)').textContent.trim() == dataTypeDesc);
-    }, dataTypeDesc);
-
-    assert.isFalse(hasDataType, 'should not contain the new data type in the table');
-
-    await page.screenshot({ path: 'Error.png' });
+    await page.screenshot({ path: './test/BEXIS2_Data_Type/DT_Screenshots/invalidNameError.png' });
   });
 
-  it('should create a new unit', async () => {
+  it('should create a new data type', async () => {
 
     const page = await Browser.openTab();
 
@@ -77,7 +75,7 @@ describe('Create Data Type', () => {
     if (!(await util.login.isLoggedIn(page))) {
       await assert.isFulfilled(util.login.loginUser(page), 'should login');
     }
-    await assert.isFulfilled(dataElements.createDataType(page, util, elements, dataElements, assert, 'data.test.name'));
+    await assert.isFulfilled(dataElements.createDataType(page, util, elements, dataElements, assert, 'data.test.name', 'data.test.desc'), 'should create a new data type');
   });
 });
 

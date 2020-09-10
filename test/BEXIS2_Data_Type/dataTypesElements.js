@@ -6,7 +6,8 @@
 export default {
   createDataType,
   deleteDataType,
-  chooseOptionValue
+  chooseOptionValue,
+  filterDescription
 };
 
 /** Create a Data Type
@@ -18,7 +19,7 @@ export default {
  * @param {string} dataTypeName
  */
 
-async function createDataType(page, util, elements, dataElements, assert, dataTypeName) {
+async function createDataType(page, util, elements, dataElements, assert, dataTypeName, dataTypeDescName) {
 
   // navigate to "Manage Data Types"
   await util.menu.select(page, 'Manage Data Types');
@@ -36,12 +37,13 @@ async function createDataType(page, util, elements, dataElements, assert, dataTy
   await page.type('#dataType_Name', dataTypeName);
 
   // find Description field and type a description for a data type
-  await page.type('#dataType_Description', 'data.test.desc');
-
-  await elements.typeInputField(page, '#dataType_Description', 'data.test.desc');
+  await elements.typeInputField(page, '#dataType_Description', dataTypeDescName);
 
   // select a random value for System Type
   await dataElements.chooseOptionValue(page, '#systemType option', 'systemType');
+
+  // screenshot of data type window
+  await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/dataTypeWindow.png'});
 
   // click Save button
   await page.click('#saveButton');
@@ -51,20 +53,16 @@ async function createDataType(page, util, elements, dataElements, assert, dataTy
 
   // check error messages of the data type window
   // should not be visible at all and should not contain any errors
-  const hasErrors = await page.evaluate(() => Array.from(document.querySelectorAll('#name > td.bx-errorMsg')).some((el) => el.textContent.trim()));
-  assert.isFalse(hasErrors, 'should not show any errors');
+  const checkErrMsg = await elements.hasErrors(page, '#name > td.bx-errorMsg');
+  assert.isFalse(checkErrMsg, 'should not show any errors');
 
-  // check for the new entry in the list of data types
-  const hasDataType = await page.$$eval('#bx-rpm-dataTypeGrid > table > tbody > tr', (rows, dataTypeName) => {
-    return rows.some((tr) => tr.querySelector('td:nth-child(2)').textContent.trim() == dataTypeName);
-  }, dataTypeName);
+  // check for an entry by Description Name in the list of data types
+  const checkEntry = await elements.hasEntry(page, '#bx-rpm-dataTypeGrid > table > tbody > tr', dataTypeDescName, '5');
+  assert.isTrue(checkEntry, 'should contain the new data type in the table');
 
-  assert.isTrue(hasDataType, 'should contain the new data type in the table');
-
-  await page.screenshot({ path: 'Error2.png' });
 }
 
-async function deleteDataType(page, util, assert, elements) {
+async function deleteDataType(page, util, assert, elements, dataTypeDescName) {
 
   // navigate to "Manage Data Types"
   await util.menu.select(page, 'Manage Data Types');
@@ -78,6 +76,9 @@ async function deleteDataType(page, util, assert, elements) {
   // type in first input field description name of the data type in dropdown
   await elements.typeInputField(page, '#bx-rpm-dataTypeGrid div.t-animation-container div input[type=text]:nth-child(4)', 'data.test.desc');
 
+  // screenshot of Filter
+  await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/deleteFilter.png'});
+
   // click Filter button and wait for navigation
   await Promise.all([
     page.waitForNavigation(),
@@ -90,15 +91,9 @@ async function deleteDataType(page, util, assert, elements) {
   // click delete button
   await page.click('#bx-rpm-dataTypeGrid > table > tbody > tr > td:nth-child(6) > div > a.bx.bx-grid-function.bx-trash');
 
-  // check for the new entry in the list of data types
-  const dataTypeDesc = 'data.test.desc';
-  const hasDataType = await page.$$eval('#bx-rpm-dataTypeGrid > table > tbody > tr', (rows, dataTypeDesc) => {
-    return rows.some((tr) => tr.querySelector('td:nth-child(5)').textContent.trim() == dataTypeDesc);
-  }, dataTypeDesc);
-
-  assert.isFalse(hasDataType, 'should not contain the new data type in the table');
-
-  await page.screenshot({path: 'filter.png'});
+  // check for an entry by Description Name in the list of data types
+  const checkEntry = await elements.hasEntry(page, '#bx-rpm-dataTypeGrid > table > tbody > tr', dataTypeDescName, '5');
+  assert.isFalse(checkEntry, 'should not contain the new data type in the table');
 }
 
 /** Choose an option from a select element
@@ -128,4 +123,22 @@ async function chooseOptionValue(page, selector, selectName) {
 
     await page.select('select[name="pattern"]', patternValues[randomPatternValue]);
   }
+}
+
+async function filterDescription(page, elements, dataTypeDescName) {
+
+  // click filter icon for Description header
+  await page.click('#bx-rpm-dataTypeGrid > table > thead > tr > th:nth-child(5) > div');
+
+  // type in first input field description name of the data type in dropdown
+  await elements.typeInputField(page, '#bx-rpm-dataTypeGrid div.t-animation-container div input[type=text]:nth-child(4)', dataTypeDescName);
+
+  // check description name text - in case of removal add waitFor()
+  await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/filterDescName.png'});
+
+  // click Filter button and wait for navigation
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#bx-rpm-dataTypeGrid > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button'),
+  ]);
 }
