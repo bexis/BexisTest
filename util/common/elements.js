@@ -18,7 +18,8 @@ export default {
   filterTable_Telerik2,
   extractFirstRowNthColumnValue_Telerik,
   returnSelectContent,
-  clearInputField
+  clearInputField,
+  typeInputField
 };
 
 
@@ -244,4 +245,18 @@ async function clearInputField(page, selector) {
   await page.evaluate(selector => {
     document.querySelector(selector).value = '';
   }, selector);
+}
+
+/**
+ * Type in Input field
+ *
+ * @param {Object} page
+ * @param {string} selector
+ * @param {string} text
+ */
+
+async function typeInputField(page, selector, text) {
+  await page.evaluate((selector, text) => {
+    document.querySelector(selector).value = text;
+  }, selector, text);
 }

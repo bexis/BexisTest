@@ -12,6 +12,7 @@ export default
   checkAndLoginUser: (page) => checkAndLogin( page, 'normal' ),
   checkAndLoginAdmin: (page) => checkAndLogin( page, 'admin' ),
   logoff: logoff,
+  isLoggedIn: checkLogin,
 };
 
 
@@ -79,9 +80,5 @@ async function logoff( page ) {
  */
 async function checkLogin ( page ){
   const $el = await page.$( '#registerLink' );
-  if ($el != null){
-    return false;
-  }
-  else
-    return true;
+  return $el == null;
 }
