@@ -44,7 +44,7 @@ describe('Create Data Type', () => {
     await assert.isFulfilled(elements.typeInputField(page, '#dataType_Description', 'data.test.skip'), 'should enter a data type description');
 
     // screenshot of data type window for Description Name
-    await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/dataTypeDescName.png'});
+    await page.screenshot({path: './test/BEXIS2_Data_Type/dataTypeDescName.png'});
 
     // select a random value for System Type
     await assert.isFulfilled(dataElements.chooseOptionValue(page, '#systemType option', 'systemType'), 'should select a random value for system type');
@@ -64,7 +64,7 @@ describe('Create Data Type', () => {
     const checkEntry = await elements.hasEntry(page, '#bx-rpm-dataTypeGrid > table > tbody > tr', dataTypeDescName, '5');
     assert.isFalse(checkEntry, 'should not contain the new data type in the table');
 
-    await page.screenshot({ path: './test/BEXIS2_Data_Type/DT_Screenshots/invalidNameError.png' });
+    await page.screenshot({ path: './test/BEXIS2_Data_Type/invalidNameError.png' });
   });
 
   it('should create a new data type', async () => {

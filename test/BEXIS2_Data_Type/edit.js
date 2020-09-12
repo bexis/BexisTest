@@ -49,7 +49,7 @@ describe('Edit Data Type', () => {
     await assert.isFulfilled(dataElements.filterDescription(page, elements, 'data.test.desc'), 'should filter description name of the data type');
 
     // click edit button
-    await page.click('#bx-rpm-dataTypeGrid > table > tbody > tr > td:nth-child(6) > div > a.bx.bx-grid-function.bx-edit');
+    await assert.isFulfilled(page.click('#bx-rpm-dataTypeGrid > table > tbody > tr > td:nth-child(6) > div > a.bx.bx-grid-function.bx-edit'), 'should click edit button');
 
     // wait for Data Type Window is loaded in view model
     await assert.isFulfilled(page.waitForSelector('#DataTypeWindow', { visible: true }), 'should wait for data type window');
@@ -64,7 +64,7 @@ describe('Edit Data Type', () => {
     await assert.isFulfilled(dataElements.chooseOptionValue(page, '#systemType option', 'systemType'), 'should select a random value for system type');
 
     // screenshot of data type window before save
-    await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/editDataTypeWindow.png'});
+    await page.screenshot({path: './test/BEXIS2_Data_Type/editDataTypeWindow.png'});
 
     // click Save button
     await assert.isFulfilled(page.click('#saveButton'), 'should save the edited data type');

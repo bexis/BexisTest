@@ -34,7 +34,7 @@ async function createDataType(page, util, elements, dataElements, assert, dataTy
   await page.waitForSelector('#DataTypeWindow', { visible: true });
 
   // find Name field and type a name for data type
-  await page.type('#dataType_Name', dataTypeName);
+  await elements.typeInputField(page, '#dataType_Name', dataTypeName);
 
   // find Description field and type a description for a data type
   await elements.typeInputField(page, '#dataType_Description', dataTypeDescName);
@@ -43,7 +43,7 @@ async function createDataType(page, util, elements, dataElements, assert, dataTy
   await dataElements.chooseOptionValue(page, '#systemType option', 'systemType');
 
   // screenshot of data type window
-  await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/dataTypeWindow.png'});
+  await page.screenshot({path: './test/BEXIS2_Data_Type/dataTypeWindow.png'});
 
   // click Save button
   await page.click('#saveButton');
@@ -77,7 +77,7 @@ async function deleteDataType(page, util, assert, elements, dataTypeDescName) {
   await elements.typeInputField(page, '#bx-rpm-dataTypeGrid div.t-animation-container div input[type=text]:nth-child(4)', 'data.test.desc');
 
   // screenshot of Filter
-  await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/deleteFilter.png'});
+  await page.screenshot({path: './test/BEXIS2_Data_Type/deleteFilter.png'});
 
   // click Filter button and wait for navigation
   await Promise.all([
@@ -134,7 +134,7 @@ async function filterDescription(page, elements, dataTypeDescName) {
   await elements.typeInputField(page, '#bx-rpm-dataTypeGrid div.t-animation-container div input[type=text]:nth-child(4)', dataTypeDescName);
 
   // check description name text - in case of removal add waitFor()
-  await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/filterDescName.png'});
+  await page.screenshot({path: './test/BEXIS2_Data_Type/filterDescName.png'});
 
   // click Filter button and wait for navigation
   await Promise.all([
