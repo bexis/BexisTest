@@ -21,7 +21,12 @@ export default {
   returnSelectContentAndValue,
   returnContent,
   sortTable,
-  clearInputField
+  clearInputField,
+  typeInputField,
+  hasEntry,
+  hasErrors
+
+
 };
 
 
@@ -285,6 +290,49 @@ async function clearInputField(page, selector) {
   await page.evaluate(selector => {
     document.querySelector(selector).value = '';
   }, selector);
+}
+
+/**
+ * Type in Input field
+ *
+ * @param {Object} page
+ * @param {string} selector
+ * @param {string} text
+ */
+
+async function typeInputField(page, selector, text) {
+  await page.evaluate((selector, text) => {
+    document.querySelector(selector).value = text;
+  }, selector, text);
+}
+
+/**
+ * Type in Input field
+ *
+ * @param {Object} page
+ * @param {string} table
+ * @param {string} entry
+ * @param {string} tdChild
+ */
+
+async function hasEntry(page, table, entry, tdChild){
+  const result =  await page.$$eval(table, (rows, entry, tdChild) => {
+    return rows.some((tr) => tr.querySelector(`td:nth-child(${tdChild})`).textContent.trim() == entry);
+  }, entry, tdChild);
+  return result;
+}
+
+/**
+ * Checks error message fields for form windows
+ *
+ * @param {Object} page
+ * @param {string} errMsgField
+ */
+
+async function hasErrors(page, errMsgField) {
+  return await page.evaluate((errMsgField) => Array
+    .from(document.querySelectorAll(errMsgField))
+    .some((el) => el.textContent.trim()), errMsgField);
 }
 
 /**
