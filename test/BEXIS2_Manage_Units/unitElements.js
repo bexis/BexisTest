@@ -6,6 +6,7 @@
 export default {
   createUnit,
   deleteUnit,
+  editUnit,
   filterDescription,
   chooseDimensionName,
   chooseDataType,
@@ -16,67 +17,65 @@ export default {
 /**
  * Create unit
  *
- * @param   {object}    Browser
+ * @param   {object}    page
  * @param   {object}    util
  * @param   {object}    units
  * @param   {object}    assert
- * @param   {string}    descName
+ * @param   {object}    elements
+ * @param   {string}    unitDescName
  */
 
-async function createUnit(Browser, util, units, assert, descName) {
+async function createUnit(page, util, units, assert, elements, unitDescName) {
 
-  const page = await Browser.openTab();
+  try {
+    // navigate to "Manage Units"
+    await util.menu.select(page, 'Manage Units');
 
-  // navigate to "Manage Units"
-  await util.menu.select(page, 'Manage Units');
+    // wait until the container is loaded in view mode
+    await page.waitForSelector('#information-container', { visible: true });
 
-  // wait until the container is loaded in view mode
-  await page.waitForSelector('#information-container', { visible: true });
+    // click Create Unit button
+    await page.click('.bx-button');
 
-  // count the number of rows before a new entry
-  const rowCountBefore = (await page.$$('#bx-rpm-unitGrid > table > tbody > tr')).length;
+    // wait until the unit window is loaded in view mode
+    await page.waitForSelector('#UintWindow', { visible: true });
 
-  // click Create Unit button
-  await page.click('.bx-button');
+    // find Name field
+    await page.type('#Unit_Name', 'unit.test.name');
 
-  // wait until the unit window is loaded in view mode
-  await page.waitForSelector('#UintWindow', { visible: true });
+    // find Abbreviation field
+    await page.type('#Unit_Abbreviation', 'unit.test.abv');
 
-  // find Name field
-  await page.type('#Unit_Name', 'unit.test.name');
+    // find Description field
+    await page.type('#Unit_Description', unitDescName);
 
-  // find Abbreviation field
-  await page.type('#Unit_Abbreviation', 'unit.test.abv');
+    // choose a value for Dimension Name
+    await units.chooseDimensionName(page);
 
-  // find Description field
-  await page.type('#Unit_Description', descName);
+    // choose a Data Type
+    await units.chooseDataType(page);
 
-  // choose a value for Dimension Name
-  await units.chooseDimensionName(page);
+    // click save button and wait for the navigation
+    await Promise.all([
+      page.waitForNavigation(),
+      page.click('#saveButton'),
+    ]);
 
-  // choose a Data Type
-  await units.chooseDataType(page);
+    // wait until the table is loaded in view mode
+    await page.waitForSelector('#bx-rpm-unitGrid > table > tbody > tr', { visible: true });
 
-  // click save button and wait for the navigation
-  await Promise.all([
-    page.waitForNavigation(),
-    page.click('#saveButton'),
-  ]);
+    // check error messages of the create unit window
+    // should not be visible at all and should not contain any errors
+    const checkErrMsg = await elements.hasErrors(page, '#createUnit .bx-errorMsg');
+    assert.isFalse(checkErrMsg, 'should not show any errors');
 
-  // wait until the table is loaded in view mode
-  await page.waitForSelector('#bx-rpm-unitGrid > table > tbody > tr', { visible: true });
+    // check for an entry by Description Name in the list of units
+    const checkEntry = await elements.hasEntry(page, '#bx-rpm-unitGrid  > table > tbody > tr', 'unit.test.desc', '7');
+    assert.isTrue(checkEntry, 'should contain the unit in the table');
 
-  // count the number of rows after a new entry
-  const rowCountAfter = (await page.$$('#bx-rpm-unitGrid > table > tbody > tr')).length;
-
-  // find difference between rows
-  const diffRows = rowCountAfter - rowCountBefore;
-
-  // checks if a new entry is added or not
-  if (diffRows === 0) {
-    assert.equal(rowCountBefore, rowCountAfter, 'No new entry is added');
-  } else if (diffRows === 1) {
-    assert.notEqual(rowCountBefore, rowCountAfter, 'New entry is added');
+  } catch(e) {
+    await page.screenshot({path: './test/BEXIS2_Manage_Units/errorCreateUnit.png'});
+    throw e;
   }
 }
 
@@ -84,26 +83,49 @@ async function createUnit(Browser, util, units, assert, descName) {
 /**
  * Delete unit
  *
- * @param {Object} Browser
- * @param {Object} units
+ * @param {Object} page
  * @param {Object} util
- * @param {string} navigation
- * @param {string} containerId
- * @param {string} id
- * @param {string} descName
+ * @param {Object} assert
+ * @param {Object} elements
+ * @param {string} unitName
+ * @param {string} unitDescName
  */
 
-async function deleteUnit(Browser, units, util, navigation, containerId, id, descName) {
-  const page = await Browser.openTab();
+async function deleteUnit(page, util, assert, elements, unitName, unitDescName) {
 
-  // filter unit description in the table
-  await units.filterDescription(page, util, navigation, containerId, id, descName);
+  // navigate to "Manage Units"
+  await util.menu.select(page, 'Manage Units');
+
+  // wait until the container is loaded in view mode
+  await page.waitForSelector('#information-container', { visible: true });
 
   // after clicking delete icon alert box is shown -> click Ok
   page.on('dialog', async dialog => { await dialog.accept(); });
 
-  // click the Delete icon to delete the unit
-  await page.click('#bx-rpm-unitGrid > table > tbody > tr > td:nth-child(8) > div > a.bx.bx-grid-function.bx-trash');
+  // click Delete button
+  const deleteButton = await page.$$((`a[title*="${unitName}"]`));
+  await deleteButton[1].click();
+
+  // wait until the container is loaded in view mode
+  await page.waitForSelector('#information-container', { visible: true });
+
+  // check for an entry by Description Name in the list of units
+  const checkEntry = await elements.hasEntry(page, '#bx-rpm-unitGrid  > table > tbody > tr', unitDescName, '7');
+  assert.isFalse(checkEntry, 'should not contain the unit in the table');
+}
+
+
+/** Edit unit
+ *
+ * @param {Object} page
+ * @param {string} unitName
+ */
+
+async function editUnit(page, unitName) {
+
+  // click edit button
+  const editButton = await page.$$((`a[title*="${unitName}"]`));
+  await editButton[0].click();
 }
 
 
@@ -148,26 +170,16 @@ async function filterDescription(page, util, navigation, containerId, id, descNa
 
 async function chooseDimensionName(page) {
 
-  // random number gerenerator for Dimension Name
-  const randomDimName = Math.floor(Math.random() * 38) + 1;
-
-  // random number gerenerator for Measurment System
-  const randomMeasure = Math.floor(Math.random() * (6 - 2)) + 2;
+  // random number generator for Dimension Name -> (Math.floor(Math.random() * (max - min + 1) + min))
+  const randomDimName = Math.floor(Math.random() * (39 - 2 + 1) + 2);
 
   // click dropdown menu for Dimension Name menu
   await page.click('#createUnit > form > table > tbody > tr:nth-child(4) > td:nth-child(2) > div > div > span');
 
+  await page.screenshot({path: './test/BEXIS2_Manage_Units/chooseDimName.png'});
+
   // choose a random Dimension Name value
   await page.click(`body > div.t-animation-container > div > ul > li:nth-child(${randomDimName})`);
-
-  // click dropdown menu for Measurement System menu
-  await page.click('#createUnit > form > table > tbody > tr:nth-child(6) > td:nth-child(2) > div > div');
-
-  // there are more than one of the same class name -> choose the first selector
-  const selectors = await page.$$(`body > div.t-animation-container > div > ul > li:nth-child(${randomMeasure})`);
-
-  // choose a random Measurement System value
-  await selectors[1].click();
 }
 
 
@@ -179,10 +191,10 @@ async function chooseDimensionName(page) {
 
 async function chooseDataType(page) {
 
-  // random number gerenerator for Data Type
+  // random number generator for Data Type
   const randomDataType = Math.floor(Math.random() * 7) + 1;
 
-  // uncheck the chekboxes
+  // uncheck the checkboxes
   await page.$$eval('input[type="checkbox"]',
                     checkBoxes => checkBoxes
                       .forEach(checkBox => checkBox.checked = false));

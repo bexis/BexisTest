@@ -1,14 +1,22 @@
 import Browser from '../../util/Browser';
 import util from '../../util/common';
 import { assert } from 'chai';
+import elements from '../../util/common/elements';
 import units from './unitElements';
 
 describe('Delete Unit', () => {
 
-  // before starting the test, create a new unit
   before(async () => {
 
-    await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    //creates a unit
+    await assert.isFulfilled(units.createUnit(page, util, units, assert, elements, 'unit.test.desc'), 'should create a new unit');
   });
 
   deleteUnitTest('cancel');
@@ -26,8 +34,16 @@ async function deleteUnitTest(action) {
 
     const page = await Browser.openTab();
 
-    // filter unit description in the table
-    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    // navigate to "Manage Units"
+    await assert.isFulfilled(util.menu.select(page, 'Manage Units'), 'should open manage units page');
+
+    // wait until the container is loaded in view mode
+    await assert.isFulfilled(page.waitForSelector('#information-container', { visible: true }), 'wait for manage units page');
 
     // after clicking delete button. alert box is shown -> click Cancel
     if ('cancel' == action) {
@@ -39,24 +55,21 @@ async function deleteUnitTest(action) {
       page.on('dialog', async dialog => { await dialog.accept(); });
     }
 
-    // click the Delete button
-    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr > td:nth-child(8) > div > a.bx.bx-grid-function.bx-trash'), 'should click the delete button');
+    // click Delete button
+    const deleteButton = await page.$$(('a[title*="unit.test.name"]'));
+    await deleteButton[1].click();
 
-    // filter unit description in the table, after the deletion process
-    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
+    // wait until the container is loaded in view mode
+    await assert.isFulfilled(page.waitForSelector('#information-container', { visible: true }), 'wait for manage units page');
 
-    // get the table content
-    const tableContent = await units.returnTableContent(page);
-
-    const elementContent = (content) => {
-      return tableContent.includes(content);
-    };
+    // check for an entry by Description Name in the list of units
+    let checkEntry = await elements.hasEntry(page, '#bx-rpm-unitGrid  > table > tbody > tr', 'unit.test.desc', '7');
 
     // check if the deletion happened or not
     if ('cancel' == action) {
-      assert.isTrue(elementContent('unit.test.desc'), 'The unit should be on the table.');
+      assert.isTrue(checkEntry, 'should contain the unit in the table');
     } else if ('deletion' == action) {
-      assert.isTrue(elementContent('No records to display.'), 'The unit should not be on the table.');
+      assert.isFalse(checkEntry, 'should not contain the unit in the table');
     }
   });
 }

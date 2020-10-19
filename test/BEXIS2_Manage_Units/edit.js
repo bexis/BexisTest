@@ -1,31 +1,54 @@
 import Browser from '../../util/Browser';
 import util from '../../util/common';
 import { assert } from 'chai';
+import elements from '../../util/common/elements';
 import units from './unitElements';
 
 describe('Edit Unit', () => {
 
-  // before starting the test, create a new unit
   before(async () => {
 
-    await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    //creates a unit
+    await assert.isFulfilled(units.createUnit(page, util, units, assert, elements, 'unit.test.desc'), 'should create a new unit');
   });
 
-  // after finishing the test, delete the created unit
   after(async () => {
 
-    await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    //deletes a unit
+    await assert.isFulfilled(units.deleteUnit(page, util, assert, elements, 'new.unit.test.name', 'unit.test.desc'), 'should delete the created unit');
   });
 
   it('should edit the unit', async () => {
 
     const page = await Browser.openTab();
 
-    // filter unit description in the table
-    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should filter the unit description');
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
 
-    // click the Edit button
-    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr:nth-child(1) > td:nth-child(8) > div > a.bx.bx-grid-function.bx-edit'), 'should click the edit button');
+    // navigate to "Manage Units"
+    await assert.isFulfilled(util.menu.select(page, 'Manage Units'), 'should open manage units page');
+
+    // wait until the container is loaded in view mode
+    await assert.isFulfilled(page.waitForSelector('#information-container', { visible: true }), 'wait for manage units page');
+
+    // click edit button
+    await assert.isFulfilled(units.editUnit(page, 'unit.test.name'), 'should click edit button');
 
     // wait until the unit window is loaded in view mode
     await assert.isFulfilled(page.waitForSelector('#UintWindow', { visible: true }), 'wait for create unit form');
@@ -36,7 +59,7 @@ describe('Edit Unit', () => {
     // edit Abbreviation
     await assert.isFulfilled(page.type('#Unit_Abbreviation', 'new.'), 'should edit the abbreviation');
 
-    // choose a Dimesion Name
+    // choose a Dimension Name
     await assert.isFulfilled(units.chooseDimensionName(page), 'should choose a new dimension name');
 
     // choose a Data Type
@@ -51,14 +74,8 @@ describe('Edit Unit', () => {
     // wait until the table is loaded in view mode
     await page.waitForSelector('#bx-rpm-unitGrid > table > tbody > tr', { visible: true });
 
-    // get the table content
-    const tableContent = await units.returnTableContent(page);
-
-    let elementContent = (content) => {
-      return tableContent.includes(content);
-    };
-
-    // check if the edited unit is on the table or not
-    assert.isTrue(elementContent('new.unit.test.name'), 'The edited unit should be on the table.');
+    // check for an entry by Description Name in the list of units
+    const checkEntry = await elements.hasEntry(page, '#bx-rpm-unitGrid  > table > tbody > tr', 'unit.test.desc', '7');
+    assert.isTrue(checkEntry, 'should contain the unit in the table');
   });
 });
