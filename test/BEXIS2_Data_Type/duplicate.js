@@ -29,7 +29,7 @@ describe('Duplicate Data Type', () => {
     }
 
     // delete a data type
-    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'data.test.desc'), 'should delete the new data type');
+    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'data.test.name', 'data.test.desc'), 'should delete the new data type');
   });
 
   it('should show an error due to duplication, name already exist ', async () => {
@@ -96,11 +96,8 @@ describe('Duplicate Data Type', () => {
       return Array.from(document.getElementsByTagName('td'), element => element.innerText.trim());
     });
 
-    //filter Description Name of the data type
-    await assert.isFulfilled(dataElements.filterDescription(page, elements, 'data.test.desc'), 'should filter description name of the data type');
-
     // click edit button
-    await assert.isFulfilled(page.click('#bx-rpm-dataTypeGrid > table > tbody > tr > td:nth-child(6) > div > a.bx.bx-grid-function.bx-edit'), 'should click edit button');
+    await assert.isFulfilled(dataElements.editDataType(page, 'data.test.name'), 'should click edit button');
 
     // wait for Data Type Window is loaded in view model
     await assert.isFulfilled(page.waitForSelector('#DataTypeWindow', { visible: true }), 'should wait for data type window');
@@ -108,7 +105,7 @@ describe('Duplicate Data Type', () => {
     // clears Name input field
     await assert.isFulfilled(elements.clearInputField(page, '#dataType_Name'), 'should clear name input field');
 
-    // type name of the first unit on the table that already exists
+    // type name of the first data type on the table that already exists
     await assert.isFulfilled(elements.typeInputField(page, '#dataType_Name',  tagContent[2].toString()), 'should enter a existing name from the table');
 
     // click Save button
@@ -125,5 +122,4 @@ describe('Duplicate Data Type', () => {
     const checkErrMsg = await elements.hasErrors(page, '#name > td.bx-errorMsg');
     assert.isTrue(checkErrMsg, 'should show an error - Name already exist');
   });
-
 });
