@@ -6,21 +6,40 @@ import elements from '../../util/common/elements';
 
 describe('Duplicate Unit', () => {
 
-  // before starting the test, create a new unit
   before(async () => {
-    await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
 
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    //creates a unit
+    await assert.isFulfilled(units.createUnit(page, util, units, assert, elements, 'unit.test.desc'), 'should create a new unit');
   });
 
-  // after finishing the test, delete the created unit
   after(async () => {
 
-    await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    //deletes a unit
+    await assert.isFulfilled(units.deleteUnit(page, util, assert, elements, 'unit.test.name', 'unit.test.desc'), 'should delete the created unit');
   });
 
   it('should show an error, name and abbreviation already exist', async () => {
 
     const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
 
     // navigate to "Manage Units"
     await assert.isFulfilled(util.menu.select(page, 'Manage Units'), 'should open manage units page');
@@ -52,15 +71,24 @@ describe('Duplicate Unit', () => {
       assert.isFulfilled(page.click('#saveButton'), 'should fail to save the unit'),
     ]);
 
-    // check if the Create Unit form is visible
+    // check if the unit window is visible
     const isVisible = !!(await page.$('#UintWindow'));
-
     assert.isTrue(isVisible, 'Create unit form should be visible due to duplication.');
+
+    // check error messages of the create unit window
+    // error boxes should contain errors
+    const checkErrMsg = await elements.hasErrors(page, '#createUnit .bx-errorMsg');
+    assert.isTrue(checkErrMsg, 'should show an error');
   });
 
   it('should not edit due to duplicate name', async () => {
 
     const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
 
     // navigate to "Manage Units"
     await assert.isFulfilled(util.menu.select(page, 'Manage Units'), 'should open manage units page');
@@ -72,20 +100,8 @@ describe('Duplicate Unit', () => {
       return Array.from(document.getElementsByTagName('td'), element => element.innerText);
     });
 
-    // click the filter button in the Description column
-    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > thead > tr > th:nth-child(7) > div'));
-
-    // enter description of the unit into first input area on the dropdown
-    await assert.isFulfilled(page.type('#bx-rpm-unitGrid > div.t-animation-container > div > input[type=text]:nth-child(4)', 'unit.test.desc'));
-
-    // click the Filter button on the dropdown for finding the unit
-    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button'));
-
-    // wait until the container is loaded in view mode
-    await assert.isFulfilled(page.waitForSelector('#information-container', { visible: true }));
-
-    // click the Edit icon
-    await assert.isFulfilled(page.click('#bx-rpm-unitGrid > table > tbody > tr:nth-child(1) > td:nth-child(8) > div > a.bx.bx-grid-function.bx-edit'), 'should click the edit icon');
+    // click edit button
+    await assert.isFulfilled(units.editUnit(page, 'unit.test.name'), 'should click edit button');
 
     // wait until the unit window is loaded in view mode
     await assert.isFulfilled(page.waitForSelector('#UintWindow', { visible: true }), 'wait for create unit form');
@@ -104,7 +120,11 @@ describe('Duplicate Unit', () => {
 
     // check if the Create Unit form is visible
     const isVisible = !!(await page.$('#UintWindow'));
-
     assert.isTrue(isVisible, 'Create unit form should be visible due to duplication.');
+
+    // check error messages of the create unit window
+    // error boxes should contain errors
+    const checkErrMsg = await elements.hasErrors(page, '#createUnit .bx-errorMsg');
+    assert.isTrue(checkErrMsg, 'should show an error - Name already exist');
   });
 });

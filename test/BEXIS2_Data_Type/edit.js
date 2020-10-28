@@ -14,6 +14,7 @@ describe('Edit Data Type', () => {
     if (!(await util.login.isLoggedIn(page))) {
       await assert.isFulfilled(util.login.loginUser(page), 'should login');
     }
+
     //creates a data type
     await assert.isFulfilled(dataElements.createDataType(page, util, elements, dataElements, assert, 'data.test.name', 'data.test.desc'), 'should create a new data type');
   });
@@ -27,7 +28,8 @@ describe('Edit Data Type', () => {
       await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
     }
 
-    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'data.test.desc'), 'should delete the new data type');
+    // delete a data type
+    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'new.data.test.name', 'data.test.desc'), 'should delete the new data type');
   });
 
   it('should edit a data type', async () => {
@@ -45,11 +47,8 @@ describe('Edit Data Type', () => {
     // wait for button Create Data Type is loaded in view model
     await assert.isFulfilled(page.waitForSelector('body > div.main-content.container-fluid > table > tbody > tr > td > div > div.bx-rpm-buttons > a', { visible: true }), 'should wait for button create data type');
 
-    //filter Description Name of the data type
-    await assert.isFulfilled(dataElements.filterDescription(page, elements, 'data.test.desc'), 'should filter description name of the data type');
-
     // click edit button
-    await assert.isFulfilled(page.click('#bx-rpm-dataTypeGrid > table > tbody > tr > td:nth-child(6) > div > a.bx.bx-grid-function.bx-edit'), 'should click edit button');
+    await assert.isFulfilled(dataElements.editDataType(page, 'data.test.name'), 'should click edit button');
 
     // wait for Data Type Window is loaded in view model
     await assert.isFulfilled(page.waitForSelector('#DataTypeWindow', { visible: true }), 'should wait for data type window');
@@ -58,7 +57,7 @@ describe('Edit Data Type', () => {
     await assert.isFulfilled(elements.typeInputField(page, '#dataType_Name', 'new.data.test.name'), 'should type a new data type name');
 
     // screenshot of data type name
-    await page.screenshot({path: './test/BEXIS2_Data_Type/DT_Screenshots/editDataTypeName.png'});
+    await page.screenshot({path: './test/BEXIS2_Data_Type/editDataTypeName.png'});
 
     // select a random value for System Type
     await assert.isFulfilled(dataElements.chooseOptionValue(page, '#systemType option', 'systemType'), 'should select a random value for system type');

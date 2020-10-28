@@ -29,10 +29,10 @@ describe('Lock Data Type', () => {
     }
 
     // delete a data type
-    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'data.test.desc'), 'should delete the new data type');
+    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'data.test.name', 'data.test.desc'), 'should delete the new data type');
   });
 
-  it.only('should lock a non-locked data type', async ()=> {
+  it('should lock a non-locked data type', async ()=> {
 
     const page = await Browser.openTab();
 
@@ -73,7 +73,7 @@ describe('Lock Data Type', () => {
       '//*[@name = "DataType.Id"]/option[text() = "data.test.name"]'
     ))[0];
     const value = await (await option.getProperty('value')).jsonValue();
-    await assert.isFulfilled(page.select('#dataTypeId', value), 'should select a data type');
+    await assert.isFulfilled(page.select('#dataTypeId', value.toString()), 'should select a data type');
 
     // find Description field
     await assert.isFulfilled(elements.typeInputField(page, '#Description', 'data.test.desc'), 'should enter a description');
@@ -110,15 +110,8 @@ describe('Lock Data Type', () => {
     page.on('dialog', async dialog => { await dialog.accept(); });
 
     // click Delete button
-    try{
-      const deleteButton = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('a[title*="temp.test.name"]')[1].click());
-      });
-
-      await page.assert.isFulfilled(deleteButton(), 'should click delete button');
-    }catch(e){
-      // console.log(e);
-    }
+    const deleteButton = await page.$$(('a[title*="temp.test.name"]'));
+    await assert.isFulfilled(deleteButton[1].click(), 'should click the delete button');
 
     // wait until the container is loaded in view mode
     await assert.isFulfilled(page.waitForSelector('#informationContainer', { visible: true }), 'wait for manage variable templates page');

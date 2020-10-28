@@ -15,7 +15,8 @@ describe('Create Data Type', () => {
       await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
     }
 
-    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'data.test.desc'), 'should delete the new data type');
+    // deletes a data type
+    await assert.isFulfilled(dataElements.deleteDataType(page, util, assert, elements, 'data.test.name', 'data.test.desc'), 'should delete the new data type');
   });
 
   it('should not create a new data type -- name field is skipped', async () => {
@@ -64,6 +65,7 @@ describe('Create Data Type', () => {
     const checkEntry = await elements.hasEntry(page, '#bx-rpm-dataTypeGrid > table > tbody > tr', dataTypeDescName, '5');
     assert.isFalse(checkEntry, 'should not contain the new data type in the table');
 
+    // screenshot of an invalid name error
     await page.screenshot({ path: './test/BEXIS2_Data_Type/invalidNameError.png' });
   });
 
@@ -75,7 +77,8 @@ describe('Create Data Type', () => {
     if (!(await util.login.isLoggedIn(page))) {
       await assert.isFulfilled(util.login.loginUser(page), 'should login');
     }
+
+    //creates a data type
     await assert.isFulfilled(dataElements.createDataType(page, util, elements, dataElements, assert, 'data.test.name', 'data.test.desc'), 'should create a new data type');
   });
 });
-

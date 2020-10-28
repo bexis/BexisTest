@@ -1,25 +1,45 @@
 import Browser from '../../util/Browser';
 import util from '../../util/common';
 import { assert } from 'chai';
+import elements from '../../util/common/elements';
 import units from './unitElements';
 
 describe('Lock Unit', () => {
 
-  // before starting the test, create a new unit
   before(async () => {
 
-    await assert.isFulfilled(units.createUnit(Browser, util, units, assert, 'unit.test.desc'), 'should create a new unit');
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    //creates a unit
+    await assert.isFulfilled(units.createUnit(page, util, units, assert, elements, 'unit.test.desc'), 'should create a new unit');
   });
 
-  // after finishing the test, delete the created unit
   after(async () => {
 
-    await assert.isFulfilled(units.deleteUnit(Browser, units, util, 'Manage Units', '#information-container', '#bx-rpm-unitGrid', 'unit.test.desc'), 'should delete the created unit');
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    //deletes a unit
+    await assert.isFulfilled(units.deleteUnit(page, util, assert, elements, 'unit.test.name', 'unit.test.desc'), 'should delete the created unit');
   });
 
   it('should lock a non-locked unit', async () => {
 
     const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
 
     // navigate to "Manage Variable Templates"
     await assert.isFulfilled(util.menu.select(page, 'Manage Variable Templates'), 'should open manage variable templates page');
@@ -34,7 +54,7 @@ describe('Lock Unit', () => {
     await assert.isFulfilled(page.waitForSelector('#AttributeWindow', { visible: true }), 'wait for create variable template form');
 
     // find Name field
-    await assert.isFulfilled(page.type('#Name', 'temp.test.name'), 'should eneter a template name');
+    await assert.isFulfilled(page.type('#Name', 'temp.test.name'), 'should enter a template name');
 
     // find Unit field
     await assert.isFulfilled(page.type('#unitId', 'unit.test.name'), 'should enter a unit name');
@@ -44,6 +64,9 @@ describe('Lock Unit', () => {
 
     // click Save button
     await assert.isFulfilled(page.click('#saveButton'), 'should save the new template');
+
+    // wait until the container is loaded in view mode
+    await assert.isFulfilled(page.waitForSelector('#informationContainer', { visible: true }), 'wait for manage variable templates page');
 
     // navigate to "Manage Units"
     await assert.isFulfilled(util.menu.select(page, 'Manage Units'), 'should open manage units page');
@@ -68,13 +91,18 @@ describe('Lock Unit', () => {
     // wait until the container is loaded in view mode
     await assert.isFulfilled(page.waitForSelector('#informationContainer', { visible: true }), 'wait for manage variable templates page');
 
-    // filter unit description in the table
-    await assert.isFulfilled(units.filterDescription(page, util, 'Manage Variable Templates', '#informationContainer', '#bx-rpm-attributeGrid', 'unit.test.desc'), 'should filter the unit description');
-
-    // after clicking delete button alert box is shown -> click Ok
+    // after clicking delete icon alert box is shown -> click Ok
     page.on('dialog', async dialog => { await dialog.accept(); });
 
-    // click the Delete button
-    await assert.isFulfilled(page.click('#bx-rpm-attributeGrid > table > tbody > tr > td:nth-child(8) > div > a.bx.bx-grid-function.bx-trash'), 'should click the delete button');
+    // click Delete button
+    const deleteButton = await page.$$(('a[title*="temp.test.name"]'));
+    await assert.isFulfilled(deleteButton[1].click(), 'should click the delete button');
+
+    // wait until the container is loaded in view mode
+    await assert.isFulfilled(page.waitForSelector('#informationContainer', { visible: true }), 'wait for manage variable templates page');
+
+    // check for an entry by Name in the list of variable templates
+    const checkEntry = await elements.hasEntry(page, '#bx-rpm-attributeGrid > table > tbody > tr', 'temp.test.name', '2');
+    assert.isFalse(checkEntry, 'should not contain the template in the table');
   });
 });
