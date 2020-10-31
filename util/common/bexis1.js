@@ -10,6 +10,7 @@ export default {
   countDS_BEXIS1,
   returnTable_unstructured_BEXIS1,
   returnTable_structured_BEXIS1,
+  returnTable_ds_overview__BEXIS1,
   returnTable_metadata_BEXIS1,
 };
 
@@ -89,12 +90,22 @@ async function returnTable_structured_BEXIS1( page ) {
 }
 
 /**
+   * Return table content from dataset overview
+   *
+   * @param {Object} page
+   */
+async function returnTable_ds_overview__BEXIS1( page ) {
+  return await returnTable_BEXIS1( page , 'ctl00_ctl00_ContentPlaceHolder_Main_ContentPlaceHolder_Page_GridView_Datasets');
+}
+
+
+/**
    * Return table content from structured table in BEXIS 1
    *
    * @param {Object} page
    */
 async function returnTable_metadata_BEXIS1( page ) {
-  return await returnTable_BEXIS1( page , 'ctl00_ContentPlaceHolder_Main_Label_metadataContent');
+  return await returnTable_BEXIS1( page , 'content #ctl00_ContentPlaceHolder_Main_Label_metadataContent');
 }
 
 /**

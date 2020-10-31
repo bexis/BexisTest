@@ -5,7 +5,7 @@ import login from '../../util/common/login';
 
 describe( 'Create Dataset (ABCD): new file', () => {
 
-  it( 'should show an error when create dataset not succesfull', async () => {
+  it( 'should show an error when create dataset not successful', async () => {
 
     // open a new tab
     const page = await Browser.openTab();
@@ -21,7 +21,7 @@ describe( 'Create Dataset (ABCD): new file', () => {
     await assert.isFulfilled( page.click( 'input[value="CreateNewFile"]' ), 'should select file data' );
 
     // find telerik dorpdown to open list
-    await assert.isFulfilled( page.click( 'div[title="Select a Metadata Structure"]' ), 'should open select metadate structure' );
+    await assert.isFulfilled( page.click( 'div[title="Select a Metadata Structure"]' ), 'should open select metadata structure' );
 
     // this is currently implicit via the position in the list, which assumes ABCD at 2nd position
     await assert.isFulfilled( page.click( '.t-animation-container > div > ul> li:nth-child(2)' ), 'should select ABCD schema' );
@@ -49,7 +49,7 @@ describe( 'Create Dataset (ABCD): new file', () => {
 
 describe( 'Create Dataset (ABCD): new tabular data', () => {
 
-  it( 'should show an error when create dataset not succesfull', async () => {
+  it( 'should show an error when create dataset not successful', async () => {
 
     // open a new tab
     const page = await Browser.openTab();
@@ -66,7 +66,7 @@ describe( 'Create Dataset (ABCD): new tabular data', () => {
     await assert.isFulfilled( page.click( 'input[value="CreateNewStructure"]' ), 'should select file data' );
 
     // find telerik dorpdown to open list
-    await assert.isFulfilled( page.click( 'div[title="Select a Metadata Structure"]' ), 'should open select metadate structure' );
+    await assert.isFulfilled( page.click( 'div[title="Select a Metadata Structure"]' ), 'should open select metadata structure' );
 
     // this is currently implicit via the position in the list, which assumes ABCD at 2nd position
     await assert.isFulfilled( page.click( '.t-animation-container > div > ul> li:nth-child(2)' ), 'should select ABCD schema' );

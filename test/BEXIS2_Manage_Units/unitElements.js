@@ -170,11 +170,16 @@ async function filterDescription(page, util, navigation, containerId, id, descNa
 
 async function chooseDimensionName(page) {
 
-  // random number generator for Dimension Name -> (Math.floor(Math.random() * (max - min + 1) + min))
-  const randomDimName = Math.floor(Math.random() * (39 - 2 + 1) + 2);
-
   // click dropdown menu for Dimension Name menu
   await page.click('#createUnit > form > table > tbody > tr:nth-child(4) > td:nth-child(2) > div > div > span');
+
+  // random number generator for Dimension Name -> (Math.floor(Math.random() * (max - min + 1) + min))
+  // set max from length of list
+  const maxLength = await page.evaluate(() => {
+    const rows = document.querySelectorAll('body > div.t-animation-container > div > ul > li');
+    return rows.length;
+  });
+  const randomDimName = Math.floor(Math.random() * (maxLength - 2 + 1) + 2); // todo
 
   await page.screenshot({path: './test/BEXIS2_Manage_Units/chooseDimName.png'});
 

@@ -15,17 +15,114 @@ var count_b2 = 0;
 var datesB1 = [];
 
 var dataset_ids = ds_ids.dataset_Ids();
-var dataset_subset = dataset_ids.slice(0, 50);
+var dataset_subset = dataset_ids.slice(600,1200);
 
 var unstructured_dataset_ids = ds_ids.unstructured_Ids();
+var mat_view = [19147	,
+                19168	,
+                19434	,
+                20030	,
+                20346	,
+                21047	,
+                21048	,
+                21386	,
+                21449	,
+                21566	,
+                21766	,
+                22006	,
+                22471	,
+                22547	,
+                22627	,
+                22628	,
+                22906	,
+                22968	,
+                22969	,
+                23288	,
+                23289	,
+                23686	,
+                23746	,
+                23946	,
+                24247	,
+                24406	,
+                24407	,
+                24426	,
+                24466	,
+                24607	,
+                24691	,
+                24692	,
+                24728	,
+                24786	,
+                24866	,
+                24868	,
+                24946	,
+                25066	,
+                25067	,
+                25086	,
+                25607	,
+                25626	,
+                25886	,
+                26446	,
+                26466	,
+                26487	,
+                4661	,
+                5680	,
+                5682	,
+                6060	,
+                6280	,
+                10042	,
+                10160	,
+                11500	,
+                12806	,
+                13149	,
+                15246	,
+                17766	,
+                27007	,
+                27026	,
+                27066
+];
+var exclude_datasets = [
+  15246	,
+  17766	,
+  19147	,
+  19168	,
+  21047	,
+  21048	,
+  21386	,
+  21566	,
+  21766	,
+  22471	,
+  22547	,
+  22627	,
+  22628	,
+  22906	,
+  22968	,
+  22969	,
+  23288	,
+  23289	,
+  23686	,
+  23946	,
+  24406	,
+  24407	,
+  24426	,
+  24466	,
+  24607	,
+  24691	,
+  24692	,
+  24786	,
+  24866	,
+  24868	,
+  24946	,
+  25607	,
+  25626
+];
 
 
-describe.skip( 'Compare structured datasets', () => {
+describe( 'Compare structured datasets', () => {
 
-  for (let i = 0; i < dataset_subset.length; i++) {
-    //compare_datasets(dataset_subset[i]);
+  for (let i = 0; i < mat_view.length; i++) {
+    compare_datasets(mat_view[i]);
   }
-  //compare_datasets(25086);
+  // compare_datasets(14406);
 
   it('print result for collected dates', async () => {
     console.log(datesB1);
@@ -82,7 +179,7 @@ describe.skip( 'Compare structured datasets', () => {
   });
 });
 
-describe.only('Compare unstructured ', () => {
+describe.skip('Compare unstructured ', () => {
 
   for (let i = 0; i < unstructured_dataset_ids.length; i++) {
     compare_unstructured_datasets(unstructured_dataset_ids[i]);
@@ -111,19 +208,13 @@ async function compare_datasets(id){
     // navigate to show data page
     await assert.isFulfilled( page2.goto( Config.browser2.baseURL + '/Data/ShowData.aspx?DatasetId=' + id ), 'should open show data page' );
 
-    // sort by obdId
 
-    // await page2.evaluate(() => {
-    //   document.querySelectorAll('#ctl00_ContentPlaceHolder_Main_BlockDataControl2_GridView1')[0].classList.add('show_table');
-    // });
-    // await assert.isFulfilled( elements.clickElementByLinkText(page2, 'obsId'), ' Should click on obsId to sort by obsId');
-    // await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
 
     // get total number of datasets
     count_b1 = await bexis1.countDS_BEXIS1( page2);
 
     // get result table first page
-    const resultTable_b1 = await bexis1.returnTable_structured_BEXIS1( page2 );
+    var resultTable_b1 = await bexis1.returnTable_structured_BEXIS1( page2 );
     //console.log(resultTable_b1);
 
     // open tab
@@ -145,8 +236,46 @@ async function compare_datasets(id){
     count_b2 = await elements.itemNumber_Telerik ( page );
 
     // result table from first page
-    const resultTable_b2 = await elements.returnTableContent_Telerik (page, 'PrimaryDataResultGrid');
-    //console.log(resultTable_b2);
+    var resultTable_b2 = await elements.returnTableContent_Telerik (page, 'PrimaryDataResultGrid');
+
+    const formatsb1 = [ 'DD.MM.YYYY HH:mm:ss',  'DD.MM.YYYY HH:mm:ss A', 'MM/DD/YYYY hh:mm:ss A', 'M/DD/YYYY hh:mm:ss A','M/D/YYYY hh:mm:ss A', 'MM/D/YYYY hh:mm:ss A', 'MM/DD/YYYY h:mm:ss A', 'DD.MM.YY','D.MM.YY','DD.M.YY','DD.MM.YYYY','DD/MM/YYYY', 'YYYY-MM-DD', 'DD.MM', 'hh:mm:ss'];
+    const formatsb2 = [ 'YYYY-MM-DD', 'YYYY', 'HH:mm:ss', 'YYYY-MM-DD HH:mm:ss', 'DD.MM', 'hh:mm'];
+
+
+
+    if (resultTable_b1[3][0] != resultTable_b2[3][0] || resultTable_b1[3][1] != resultTable_b2[3][1] && !moment ( resultTable_b1[3][1], formatsb1, true).isValid()){
+
+      // sort by first column
+      await elements.sortTable ( page, '1');
+
+      // result table from first page
+      resultTable_b2 = await elements.returnTableContent_Telerik (page, 'PrimaryDataResultGrid');
+
+      // check if it fits now
+      if (resultTable_b1[3][0] != resultTable_b2[3][0]  || resultTable_b1[3][1] != resultTable_b2[3][1]){
+
+        // sort by obdId
+        await page2.evaluate(() => {
+          document.querySelectorAll('#ctl00_ContentPlaceHolder_Main_BlockDataControl2_GridView1')[0].classList.add('show_table');
+        });
+        await assert.isFulfilled( elements.clickElementByLinkText(page2, 'obsId'), ' Should click on obsId to sort by obsId');
+        await assert.isFulfilled( page2.waitForSelector( '.show_table', { hidden: true }), 'should wait for result table' );
+
+        resultTable_b1 = await bexis1.returnTable_structured_BEXIS1( page2 );
+
+        // check if it fits now
+        if (resultTable_b1[3][0] != resultTable_b2[3][0]  || resultTable_b1[3][1] != resultTable_b2[3][1]){
+          await elements.sortTable ( page, '1');
+          resultTable_b2 = await elements.returnTableContent_Telerik (page, 'PrimaryDataResultGrid');
+
+          // check if it fits now
+          if (resultTable_b1[3][0] != resultTable_b2[3][0]  || resultTable_b1[3][1] != resultTable_b2[3][1]){
+            await elements.sortTable ( page, '1');
+            resultTable_b2 = await elements.returnTableContent_Telerik (page, 'PrimaryDataResultGrid');
+          }
+        }
+      }
+    }
 
     // replace . by , for all number values
     for(var i=0; i < resultTable_b2.length; i++) {
@@ -158,11 +287,9 @@ async function compare_datasets(id){
       }
     }
 
-    console.log(resultTable_b1[3], resultTable_b2[3]);
+    //   console.log(resultTable_b1[3], resultTable_b2[3]);
 
     // search for date formates, convert and compare if equal or not. If equal replace one to avoid it is an error in the final check.
-    const formatsb1 = [ 'DD.MM.YYYY HH:mm:ss',  'DD.MM.YYYY HH:mm:ss A', 'MM/DD/YYYY hh:mm:ss A', 'M/DD/YYYY hh:mm:ss A','M/D/YYYY hh:mm:ss A', 'MM/D/YYYY hh:mm:ss A', 'MM/DD/YYYY h:mm:ss A', 'DD.MM.YY','D.MM.YY','DD.M.YY','DD.MM.YYYY','DD/MM/YYYY', 'YYYY-MM-DD', 'DD.MM', 'hh:mm:ss'];
-    const formatsb2 = [ 'YYYY-MM-DD', 'YYYY', 'HH:mm:ss', 'YYYY-MM-DD HH:mm:ss', 'DD.MM', 'hh:mm'];
     for(var a=0; a < resultTable_b1.length; a++) {
       for(var b=0; b < resultTable_b1[a].length; b++) {
         resultTable_b1[a][b] = resultTable_b1[a][b].trim();
@@ -178,6 +305,9 @@ async function compare_datasets(id){
             resultTable_b1[a][b] =  resultTable_b2[a][b];
             //console.log('Date match');
           }
+          else {
+            resultTable_b1[a][b] = resultTable_b1[a][b].replace('.',',');
+          }
         }
 
         else if (parseFloat(resultTable_b1[a][b])){
@@ -186,7 +316,7 @@ async function compare_datasets(id){
       }
     }
 
-    console.log(resultTable_b1[3], resultTable_b2[3]);
+    // console.log(resultTable_b1[3], resultTable_b2[3]);
 
     assert.deepEqual (resultTable_b2[3], resultTable_b1[3], 'should have same reuslt');
   });

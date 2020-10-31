@@ -79,3 +79,6 @@ typings/
 /test-results.xml
 /config.js
 /package-lock.json
+
+# Result folder
+/results
