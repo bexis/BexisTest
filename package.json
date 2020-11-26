@@ -9,11 +9,13 @@
     "BEXIS2_Dataset": "cross-env TEST_FOLDER='BEXIS2_Dataset' mocha --recursive --require @babel/register",
     "BEXIS2_Manage_Units": "cross-env TEST_FOLDER='BEXIS2_Manage_Units' mocha --recursive --require @babel/register",
     "BEXIS2_Data_Type": "cross-env TEST_FOLDER='BEXIS2_Data_Type' mocha --recursive --require @babel/register",
+    "BExIS_Explos_RBM": "cross-env TEST_FOLDER='BExIS_Explos_RBM' mocha --recursive --require @babel/register",
     "BE_LUI": "cross-env TEST_FOLDER='BE/BE_LUI' mocha --recursive --require @babel/register",
     "B2toB1compare_Datasets": "cross-env TEST_FOLDER='B1toB2/B2toB1compare_Datasets' mocha --recursive --require @babel/register > structured_mat_view.txt",
     "B2toB1compare_LUI": "cross-env TEST_FOLDER='B1toB2/B2toB1compare_LUI' mocha --recursive --require @babel/register",
     "B2toB1compare_Plotchart": "cross-env TEST_FOLDER='B1toB2/B2toB1compare_Plotchart' mocha --recursive --require @babel/register",
-    "B2toB1compare_SWS": "cross-env TEST_FOLDER='B1toB2/B2toB1compare_SWS' mocha --recursive --require @babel/register"    "RUN_ALL:ci": "cross-env mocha --recursive --require @babel/register --reporter mocha-junit-reporter --reporter-options includePending=true",
+    "B2toB1compare_SWS": "cross-env TEST_FOLDER='B1toB2/B2toB1compare_SWS' mocha --recursive --require @babel/register",    
+    "RUN_ALL:ci": "cross-env mocha --recursive --require @babel/register --reporter mocha-junit-reporter --reporter-options includePending=true",
     "RUN_ALL": "cross-env mocha --recursive --require @babel/register"
   },
   "author": {
