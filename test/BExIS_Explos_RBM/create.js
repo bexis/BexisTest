@@ -45,6 +45,53 @@ describe('Create Booking', () => {
       page.click('#ResourceCart > a'),
     ]);
 
+    // wait for Open Calendar icon is loaded in view model
+    await assert.isFulfilled(page.waitForSelector('#timePeriod_1 > tr:nth-child(1) > td:nth-child(2) > div > div > span > span', {visible:true}), 'should wait for calendar icon');
+
+    // click Calendar icon for a start date
+    await assert.isFulfilled(page.click('#timePeriod_1 > tr:nth-child(1) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for a start date');
+
+    // wait for Calendar to be loaded in view model
+    await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:true}), 'should wait for calendar');
+
+    // screenshot the visible calendar
+    await page.screenshot({path:'calendarVisibleStart.png'});
+
+    // click a random day on current month for a start date
+    const startDays = await page.$$('body > div.t-animation-container > div > table > tbody > tr > td:not(.t-other-month)');
+
+    // startDays.length - 2 --> it is for a gap between start and end date
+    const randomStartDays = Math.floor(Math.random() * (startDays.length - 2));
+    startDays[randomStartDays].click();
+
+    // wait for Calendar to be hidden in view model
+    await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:false}), 'should wait for calendar to be hidden');
+
+    // screenshot the calendar start date
+    await page.screenshot({path:'calendarStartDate.png'});
+
+    // click Calendar icon for an end date
+    await assert.isFulfilled(page.click('#timePeriod_1 > tr:nth-child(2) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for an end date');
+
+    // wait for Calendar is loaded in view model
+    await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:true}), 'should wait for calendar');
+
+    // screenshot the visible calendar
+    await page.screenshot({path:'calendarVisibleEnd.png'});
+
+    // click a random day on current month for an end date
+    const endDays = await page.$$('body > div.t-animation-container > div > table > tbody > tr > td:not(.t-other-month)');
+
+    // remove days until the start date for not picking a past date
+    const splicedEndDays = endDays.splice(randomStartDays);
+    splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
+
+    //  wait for Calendar to be hidden in view model
+    await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:false}), 'should wait for calendar to be hidden');
+
+    // screenshot the calendar an end date
+    await page.screenshot({path:'calendarEndDate.png'});
+
     // add Reason to the booking
     const reasonSelector = '.fa-plus';
     if (await page.$(reasonSelector) !== null) {
@@ -79,16 +126,21 @@ describe('Create Booking', () => {
       page.click('#Content_Event > div.bx-footer.right > a:nth-child(2)'),
     ]);
 
+    // wait for Calendar to appear
+    await assert.isFulfilled( page.waitForSelector( '#calendar .fc-event' ), 'should wait until the calendar including the event' );
+
+    // wait that the controls are active
+    await assert.isFulfilled( page.waitForSelector( '#displayView.ready' ), 'should wait until the controls are active' );
+
     // click List button
-    await assert.isFulfilled(page.click('#displayView > label:nth-child(2) > input[type=radio]'));
+    const listSwitch = await page.evaluateHandle( () => document.querySelector( '#displayView input[value="List"]' ).parentNode );
+    await assert.isFulfilled( listSwitch.asElement().click() );
 
     // wait for Resource Table Filter is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('#scheduleList', {visible:true}), 'should wait for resource table filter');
+    await assert.isFulfilled(page.waitForSelector('#scheduleList #resources_table > tbody > tr', {visible:true}), 'should wait for resource table filter');
 
     // check for an entry by Description Name in the list of bookings
     const checkEntry = await elements.hasEntry(page, '#resources_table > tbody > tr', 'booking.test.desc', '2');
     assert.isTrue(checkEntry, 'should contain the new booking in the table');
-
-    await page.screenshot({path:'check.png'});
   });
 });
