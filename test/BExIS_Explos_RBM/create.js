@@ -2,10 +2,38 @@ import Browser from '../../util/Browser';
 import util from '../../util/common';
 import { assert } from 'chai';
 import elements from '../../util/common/elements';
+import RBMElements from '../BExIS_Explos_RBM/RBMElements';
 
-describe('Create Booking', () => {
+describe.only('Create Booking', () => {
+
+  createBookingTest('calendar');
+  createBookingTest('reason');
+  createBookingTest('name');
+  createBookingTest('description');
 
   it('should create a booking', async () => {
+
+    const page = await Browser.openTab();
+
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
+    }
+
+    // books a resource
+    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert), 'should book a new resource');
+  });
+});
+
+/**
+ * create a test for Resource Booking with required field not filled until all fields filled
+ *
+ * @param   {String}    skipped     field to be left empty
+ */
+
+async function createBookingTest(skipped) {
+
+  it(`should show an error message when ${skipped} is missing`, async () => {
 
     const page = await Browser.openTab();
 
@@ -67,7 +95,7 @@ describe('Create Booking', () => {
     // wait for Calendar to be hidden in view model
     await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:false}), 'should wait for calendar to be hidden');
 
-    // screenshot the calendar start date
+    // screenshot the calendar for the start date
     await page.screenshot({path:'calendarStartDate.png'});
 
     // click Calendar icon for an end date
@@ -82,43 +110,69 @@ describe('Create Booking', () => {
     // click a random day on current month for an end date
     const endDays = await page.$$('body > div.t-animation-container > div > table > tbody > tr > td:not(.t-other-month)');
 
-    // remove days until the start date for not picking a past date
-    const splicedEndDays = endDays.splice(randomStartDays);
+    let splicedEndDays;
+    if ('calendar' == skipped) {
+
+      // reverse and remove days so it picks past date
+      splicedEndDays = endDays.reverse().splice((endDays.length - randomStartDays));
+    } else {
+
+      // remove days until the start date for not picking a past date
+      splicedEndDays = endDays.splice(randomStartDays);
+    }
+
+    // click a random date in spliced array
     splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
 
     //  wait for Calendar to be hidden in view model
     await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:false}), 'should wait for calendar to be hidden');
 
-    // screenshot the calendar an end date
+    // screenshot the calendar for the end date
     await page.screenshot({path:'calendarEndDate.png'});
 
-    // add Reason to the booking
-    const reasonSelector = '.fa-plus';
-    if (await page.$(reasonSelector) !== null) {
+    if (!('reason' == skipped)) {
 
-      // click add reason button
-      await assert.isFulfilled(page.click('.fa-plus'), 'should click add reason button');
+      // add Reason to the booking
+      const reasonSelector = '.fa-plus';
+      if (await page.$(reasonSelector) !== null) {
 
-      // wait for Select Activities window is loaded in view model
-      await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {visible:true}), 'should wait for select activities window');
+        // click add reason button
+        await assert.isFulfilled(page.click('.fa-plus'), 'should click add reason button');
 
-      // click a random checkbox for Select column
-      const selectCheckbox = await page.$$('input[type="checkbox"]');
-      const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length);
-      selectCheckbox[randomCheckbox].click();
+        // wait for Select Activities window is loaded in view model
+        await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {visible:true}), 'should wait for select activities window');
 
-      // click Add activities to schedule
-      await assert.isFulfilled(page.click('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button'), 'should click add activities button to schedule');
+        // click a random checkbox for Select column
+        const selectCheckbox = await page.$$('input[type="checkbox"]');
+        const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length);
+        selectCheckbox[randomCheckbox].click();
 
-      // wait for Select Activities window is not found in view model
-      await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {hidden:true}), 'should wait for select activities window to be hidden');
+        // click Add activities to schedule
+        await assert.isFulfilled(page.click('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button'), 'should click add activities button to schedule');
+
+        // wait for Select Activities window is not found in view model
+        await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {hidden:true}), 'should wait for select activities window to be hidden');
+      }
     }
 
-    // find Name field
-    await assert.isFulfilled(page.type('#Name', 'booking.test.name'), 'should enter a name');
+    // it should skip name when it is testing for reason too because there are resources that don't include reason
+    if (!('reason' == skipped) && !('name' == skipped)) {
 
-    // find Description field
-    await assert.isFulfilled(page.type('#Description', 'booking.test.desc'), 'should enter a description');
+      // wait for Name input
+      await assert.isFulfilled(page.waitForSelector('#Name'), 'should wait for name input');
+
+      // find Name field
+      await assert.isFulfilled(page.type('#Name', 'booking.test.name'), 'should enter a name');
+    }
+
+    if(!('description' == skipped)) {
+
+      // wait for Description input
+      await assert.isFulfilled(page.waitForSelector('#Description'), 'should wait for description input');
+
+      // find Description field
+      await assert.isFulfilled(page.type('#Description', 'booking.test.desc'), 'should enter a description');
+    }
 
     // click Book button
     await Promise.all([
@@ -126,21 +180,9 @@ describe('Create Booking', () => {
       page.click('#Content_Event > div.bx-footer.right > a:nth-child(2)'),
     ]);
 
-    // wait for Calendar to appear
-    await assert.isFulfilled( page.waitForSelector( '#calendar .fc-event' ), 'should wait until the calendar including the event' );
-
-    // wait that the controls are active
-    await assert.isFulfilled( page.waitForSelector( '#displayView.ready' ), 'should wait until the controls are active' );
-
-    // click List button
-    const listSwitch = await page.evaluateHandle( () => document.querySelector( '#displayView input[value="List"]' ).parentNode );
-    await assert.isFulfilled( listSwitch.asElement().click() );
-
-    // wait for Resource Table Filter is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('#scheduleList #resources_table > tbody > tr', {visible:true}), 'should wait for resource table filter');
-
-    // check for an entry by Description Name in the list of bookings
-    const checkEntry = await elements.hasEntry(page, '#resources_table > tbody > tr', 'booking.test.desc', '2');
-    assert.isTrue(checkEntry, 'should contain the new booking in the table');
+    // check error messages of the tables Enter Schedules
+    // field validation error boxes should contain errors
+    const checkErrMsg = await elements.hasErrors(page, 'table > tbody > tr > td > small > span.field-validation-error');
+    assert.isTrue(checkErrMsg, 'should show an error');
   });
-});
+}
