@@ -4,20 +4,7 @@ import { assert } from 'chai';
 import elements from '../../util/common/elements';
 import RBMElements from '../BExIS_Explos_RBM/RBMElements';
 
-describe('Create Booking', () => {
-
-  after( async() => {
-
-    const page = await Browser.openTab();
-
-    // make sure we are logged in
-    if( !(await util.login.isLoggedIn(page)) ) {
-      await assert.isFulfilled(util.login.loginUser(page), 'should log in');
-    }
-
-    // deletes a booking
-    await assert.isFulfilled(RBMElements.deleteBooking(page, util, RBMElements, assert), 'should delete the new booking');
-  });
+describe.only('Create Booking', () => {
 
   createBookingTest('calendar');
   createBookingTest('reason');
@@ -44,7 +31,6 @@ describe('Create Booking', () => {
  * @param   {String}    skipped     field to be left empty
  */
 
-// eslint-disable-next-line no-unused-vars
 async function createBookingTest(skipped) {
 
   it(`should show an error message when ${skipped} is missing`, async () => {
@@ -73,7 +59,7 @@ async function createBookingTest(skipped) {
 
     // get a random Resource
     const resourceSelect = await page.$$('span[title="Select resource"]');
-    const randomResourceSelector= Math.floor(Math.random() * resourceSelect.length) +1;
+    const randomResourceSelector= Math.floor(Math.random() * resourceSelect.length);
 
     // click a random Resource
     await assert.isFulfilled(page.click(`#Grid_Resource > table > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(3) > span`), 'should click a random resource');
@@ -103,7 +89,7 @@ async function createBookingTest(skipped) {
     const startDays = await page.$$('body > div.t-animation-container > div > table > tbody > tr > td:not(.t-other-month)');
 
     // startDays.length - 2 --> it is for a gap between start and end date
-    const randomStartDays = Math.floor(Math.random() * (startDays.length - 2)) + 1;
+    const randomStartDays = Math.floor(Math.random() * (startDays.length - 2));
     startDays[randomStartDays].click();
 
     // wait for Calendar to be hidden in view model
@@ -187,12 +173,6 @@ async function createBookingTest(skipped) {
       // find Description field
       await assert.isFulfilled(page.type('#Description', 'booking.test.desc'), 'should enter a description');
     }
-
-    // screenshot the the window before clicking book
-    await page.screenshot({path:'beforeLast.png'});
-
-    // wait for Book button
-    await assert.isFulfilled(page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(2)'), 'should wait for book button');
 
     // click Book button
     await Promise.all([
