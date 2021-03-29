@@ -38,7 +38,7 @@ async function createBooking(page, util, elements, assert) {
 
   // get a random Resource
   const resourceSelect = await page.$$('span[title="Select resource"]');
-  const randomResourceSelector= Math.floor(Math.random() * resourceSelect.length);
+  const randomResourceSelector = Math.floor(Math.random() * resourceSelect.length) + 1;
 
   // click a random Resource
   await page.click(`#Grid_Resource > table > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(3) > span`);
@@ -111,7 +111,7 @@ async function createBooking(page, util, elements, assert) {
 
     // click a random checkbox for Select column
     const selectCheckbox = await page.$$('input[type="checkbox"]');
-    const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length);
+    const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length) + 1;
     selectCheckbox[randomCheckbox].click();
 
     // click Add activities to schedule
