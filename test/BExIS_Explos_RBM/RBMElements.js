@@ -5,7 +5,9 @@
 
 export default {
   createBooking,
-  unCheck
+  deleteBooking,
+  unCheck,
+  hasBooking
 };
 
 /**
@@ -36,7 +38,7 @@ async function createBooking(page, util, elements, assert) {
 
   // get a random Resource
   const resourceSelect = await page.$$('span[title="Select resource"]');
-  const randomResourceSelector= Math.floor(Math.random() * resourceSelect.length);
+  const randomResourceSelector = Math.floor(Math.random() * resourceSelect.length) + 1;
 
   // click a random Resource
   await page.click(`#Grid_Resource > table > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(3) > span`);
@@ -109,7 +111,7 @@ async function createBooking(page, util, elements, assert) {
 
     // click a random checkbox for Select column
     const selectCheckbox = await page.$$('input[type="checkbox"]');
-    const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length);
+    const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length) + 1;
     selectCheckbox[randomCheckbox].click();
 
     // click Add activities to schedule
@@ -124,6 +126,9 @@ async function createBooking(page, util, elements, assert) {
 
   // find Description field
   await page.type('#Description', 'booking.test.desc');
+
+  // screenshot the the window before clicking book
+  await page.screenshot({path:'beforeLast.png'});
 
   // click Book button
   await Promise.all([
@@ -147,9 +152,84 @@ async function createBooking(page, util, elements, assert) {
   // wait for Resource Table Filter is loaded in view model
   await page.waitForSelector('#scheduleList #resources_table > tbody > tr', {visible:true});
 
+  // click Show without history button
+  await page.click('#history_no');
+
+  // wait for Show with history to be visible
+  await page.waitForSelector('#history_yes', {visible:true});
+
   // check for an entry by Description Name in the list of bookings
   const checkEntry = await elements.hasEntry(page, '#resources_table > tbody > tr', 'booking.test.desc', '2');
   assert.isTrue(checkEntry, 'should contain the new booking in the table');
+}
+
+/**
+ * Delete booking
+ *
+ * @param   {object}    page
+ * @param   {object}    util
+ * @param   {object}    RBMElements
+ * @param   {object}    assert
+ */
+
+async function deleteBooking(page, util, RBMElements, assert) {
+
+  // navigate to "Calendar"
+  await util.menu.select(page, 'Calendar');
+
+  // wait for Book Resource button is loaded in view model
+  await page.waitForSelector('#Content_Filter > a', { visible: true });
+
+  // click List button
+  const listSwitch = await page.evaluateHandle( () => document.querySelector( '#displayView input[value="List"]' ).parentNode );
+  await listSwitch.asElement().click();
+
+  // wait for Resource Table Filter is loaded in view model
+  await page.waitForSelector('#scheduleList #resources_table > tbody > tr', {visible:true});
+
+  // click Show without history button
+  await page.click('#history_no');
+
+  // wait for Show with history to be active
+  await page.waitForSelector('#history_yes');
+
+  // search for the booking by name
+  await page.type('#resources_table_filter > label > input[type=search]', 'booking.test.name');
+
+  // click the booked resource on its name
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#resources_table > tbody > tr > td:nth-child(1) > a'),
+  ]);
+
+  // wait for Open Calendar icon is loaded in view model
+  await page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(3)', {visible:true});
+
+  // click Delete button
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#Content_Event > div.bx-footer.right > a:nth-child(3)'),
+  ]);
+
+  // wait that the controls are active
+  await page.waitForSelector( '#displayView.ready' );
+
+  // click List button
+  const listHandle = await page.evaluateHandle( () => document.querySelector( '#displayView input[value="List"]' ).parentNode );
+  await listHandle.asElement().click();
+
+  // wait for Resource Table Filter is loaded in view model
+  await page.waitForSelector('#scheduleList #resources_table > tbody > tr', {visible:true});
+
+  // click Show without history button
+  await page.click('#history_no');
+
+  // wait for Show with history to be visible
+  await page.waitForSelector('#history_yes', {visible:true});
+
+  // check for an entry by Description Name in the list of bookings
+  const checkBooking= await RBMElements.hasBooking(page, '#resources_table > tbody > tr', 'booking.test.desc');
+  assert.isFalse(checkBooking, 'should not contain the new booking in the table');
 }
 
 async function unCheck(page) {
@@ -158,4 +238,11 @@ async function unCheck(page) {
   await page.$$eval('input[type="checkbox"]',
                     checkBoxes => checkBoxes
                       .forEach(checkBox => checkBox.checked = false));
+}
+
+async function hasBooking(page, table, entry){
+  const result =  await page.$$eval(table, (rows, entry) => {
+    return rows.some((tr) => tr.querySelector('td').textContent.trim() == entry);
+  }, entry);
+  return result;
 }
