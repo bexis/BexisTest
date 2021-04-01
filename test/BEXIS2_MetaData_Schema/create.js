@@ -1,5 +1,6 @@
 import Browser from '../../util/Browser';
 import util from '../../util/common';
+import elements from '../../util/common/elements';
 import { assert } from 'chai';
 
 describe('Create Meta Data Type', () => {
@@ -34,8 +35,12 @@ describe('Create Meta Data Type', () => {
     await assert.isFulfilled(page.click('#ReadSource > div.wizardStep_Main > div.wizardStep_Content.stepper > table > tbody > tr:nth-child(3) > td:nth-child(1) > a'), 'should click generate button');
 
     // click Next button
-    await assert.isFulfilled(page.click('#nextBt'), 'Should Click Next button');
-    console.log('success');
+    assert.isFulfilled(page.click('#nextBt'), 'Should Click Next button');
+
+    // check error messages of the create unit window
+    // error boxes should contain errors
+    const checkErrMsg = await elements.hasErrors(page, '#ReadSource > div.wizardStep_Error.stepper > ul > li');
+    assert.isTrue(checkErrMsg, 'should show an error');
 
   });
 
@@ -90,7 +95,11 @@ describe('Create Meta Data Type', () => {
 
     // click Next button
     await assert.isFulfilled(page.click('#nextBt'), 'Should Click Next button');
-    console.log('Success');
+
+    // check error messages of the create unit window
+    // error boxes should contain errors
+    const checkErrMsg = await elements.hasErrors(page, '#ImportMetadataStructureSetParameters > div.wizardStep_Error.stepper > div > ul > li');
+    assert.isTrue(checkErrMsg, 'should show an error');
   });
 
   it('should create a new Meta Data Type', async () => {
@@ -158,13 +167,9 @@ describe('Create Meta Data Type', () => {
     await assert.isFulfilled(page.waitForSelector('#metadataStructuresGrid > div > div.t-pager.t-reset > a:nth-child(5) > span'));
     await assert.isFulfilled(page.click('#metadataStructuresGrid > div > div.t-pager.t-reset > a:nth-child(5) > span'), 'Should Click Last Page button');
 
-    // find created Metadata and Log it
+    // find created Metadata and Assert it True
     await assert.isFulfilled(page.waitForSelector('#metadataStructuresGrid > table > tbody'));
-    const row = await page.$x('//td[contains(., "'+schemaName+'")]');
-    const prop = await row[0].getProperty('innerText');
-    if(prop != 'null'){
-      console.log('Success');
-    }
+    assert.isFulfilled(page.$x('//td[contains(., "'+schemaName+'")]'));
 
   });
 });
