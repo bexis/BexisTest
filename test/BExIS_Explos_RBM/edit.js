@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import elements from '../../util/common/elements';
 import RBMElements from './RBMElements';
 
-describe.only('Edit Booking', () => {
+describe('Edit Booking', () => {
 
   before(async () => {
 
