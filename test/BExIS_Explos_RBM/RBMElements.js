@@ -6,8 +6,10 @@
 export default {
   createBooking,
   deleteBooking,
+  navigationToList,
   unCheck,
-  hasBooking
+  hasBooking,
+  tableContent2D
 };
 
 /**
@@ -232,6 +234,28 @@ async function deleteBooking(page, util, RBMElements, assert) {
   assert.isFalse(checkBooking, 'should not contain the new booking in the table');
 }
 
+async function navigationToList(page, util){
+
+  // navigate to "Calendar"
+  await util.menu.select(page, 'Calendar');
+
+  // wait for Book Resource button is loaded in view model
+  await page.waitForSelector('#Content_Filter > a', { visible: true });
+
+  // click List button
+  const listSwitch = await page.evaluateHandle(() => document.querySelector( '#displayView input[value="List"]' ).parentNode);
+  await listSwitch.asElement().click();
+
+  // wait for Resource Table Filter is loaded in view model
+  await page.waitForSelector('#scheduleList #resources_table > tbody > tr', {visible:true});
+
+  // click Show without history button
+  await page.click('#history_no');
+
+  // wait for Show with history to be active
+  await page.waitForSelector('#history_yes');
+}
+
 async function unCheck(page) {
 
   // uncheck the checkboxes
@@ -246,3 +270,22 @@ async function hasBooking(page, table, entry){
   }, entry);
   return result;
 }
+
+/**
+ * Returns table content in two dimensional array
+ *
+ * @param   {object}    page
+ * @param   {string}    tableID
+ */
+
+async function tableContent2D(page, tableID) {
+  const result = await page.evaluate((tableID) => {
+    const rows = document.querySelectorAll(tableID);
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll('td');
+      return Array.from(columns, column => column.textContent.trim());
+    });
+  }, tableID);
+  return result;
+}
+
