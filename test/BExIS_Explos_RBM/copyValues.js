@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import elements from '../../util/common/elements';
 import RBMElements from '../BExIS_Explos_RBM/RBMElements';
 
-describe.only('Copy filled values to all other', () => {
+describe('Copy filled values to all other', () => {
 
   before(async () => {
 
@@ -122,9 +122,10 @@ describe.only('Copy filled values to all other', () => {
 
     // click Copy filled values to other from the first resource
     const copyFilled = await page.$$('span[title="Use filled values for all other schedules"]');
-    copyFilled[0].click();
+    await assert.isFulfilled(copyFilled[0].click(), 'should click copy filled values to other');
 
-    await assert.isFulfilled(page.screenshot({path:'checkCopiedResources.png'}), 'should screenshot the resources after copying');
+    // // screenshot the resources after copying
+    // await assert.isFulfilled(page.screenshot({path:'checkCopiedResources.png'}), 'should screenshot the resources after copying');
 
     // wait for save button to be loaded in the view model
     await assert.isFulfilled(page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(2)'), {visible:true}, 'should wait for the Save button');

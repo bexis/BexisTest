@@ -9,7 +9,8 @@ export default {
   navigationToList,
   unCheck,
   hasBooking,
-  tableContent2D
+  tableContent2D,
+  eventContent
 };
 
 /**
@@ -286,6 +287,20 @@ async function tableContent2D(page, tableID) {
       return Array.from(columns, column => column.textContent.trim());
     });
   }, tableID);
+  return result;
+}
+
+/**
+ * Returns event content from the calendar
+ *
+ * @param   {object}    page
+ * @param   {string}    tableID
+ */
+async function eventContent(page, elementID) {
+  const result = await page.evaluate((elementID) => {
+    const element = document.querySelectorAll(elementID);
+    return Array.from(element, element => element.textContent.trim());
+  }, elementID);
   return result;
 }
 

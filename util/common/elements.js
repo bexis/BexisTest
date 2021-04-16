@@ -13,6 +13,7 @@ export default {
   clickElementByLabelText,
   clickElementByLinkText,
   clickElementBySpanText,
+  clickAnyElementByText,
   findTableRowByTableCellText,
   filterTable_Telerik,
   filterTable_Telerik2,
@@ -150,6 +151,17 @@ async function clickElementByLinkText(page, text){
  */
 async function clickElementBySpanText(page, text){
   const element = await page.$x('//span[text() ="'+text+'"]');
+  await (await element[0].asElement()).click();
+}
+
+/**
+ * Find any element by text and click on it
+ *
+ * @param {Object} page
+ * @param {string} text
+ */
+async function clickAnyElementByText(page, text){
+  const element = await page.$x(`//*[contains(text(), '${text}')]`);
   await (await element[0].asElement()).click();
 }
 
