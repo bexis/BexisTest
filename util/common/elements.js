@@ -25,9 +25,8 @@ export default {
   clearInputField,
   typeInputField,
   hasEntry,
+  hasListing,
   hasErrors
-
-
 };
 
 
@@ -331,6 +330,21 @@ async function hasEntry(page, table, entry, tdChild){
   const result =  await page.$$eval(table, (rows, entry, tdChild) => {
     return rows.some((tr) => tr.querySelector(`td:nth-child(${tdChild})`).textContent.trim() == entry);
   }, entry, tdChild);
+  return result;
+}
+
+/**
+ * Check for an entry in a table
+ *
+ * @param {Object} page
+ * @param {string} table
+ * @param {string} entry
+ */
+
+async function hasListing(page, table, entry){
+  const result =  await page.$$eval(table, (rows, entry) => {
+    return rows.some((tr) => tr.querySelector('td').textContent.trim() == entry);
+  }, entry);
   return result;
 }
 

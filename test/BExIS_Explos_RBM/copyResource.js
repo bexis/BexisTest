@@ -3,7 +3,6 @@ import util from '../../util/common';
 import { assert } from 'chai';
 import elements from '../../util/common/elements';
 import RBMElements from './RBMElements';
-// import RBMElements from '../BExIS_Explos_RBM/RBMElements';
 
 describe('Copy Whole Resource', () => {
 
@@ -31,7 +30,7 @@ describe('Copy Whole Resource', () => {
     }
 
     // deletes a booking
-    await assert.isFulfilled(RBMElements.deleteBooking(page, util, RBMElements, assert), 'should delete the new booking');
+    await assert.isFulfilled(RBMElements.deleteBooking(page, util, elements, assert), 'should delete the new booking');
   });
 
   it('should copy a whole resource', async () => {

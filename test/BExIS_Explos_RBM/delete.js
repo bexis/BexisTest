@@ -82,7 +82,7 @@ describe('Delete Booking', () => {
     await assert.isFulfilled(page.waitForSelector('#history_yes'), 'should wait for show with history to be active');
 
     // check for an entry by Description Name in the list of bookings
-    const checkBooking= await RBMElements.hasBooking(page, '#resources_table > tbody > tr', 'booking.test.desc');
+    const checkBooking= await elements.hasListing(page, '#resources_table > tbody > tr', 'booking.test.desc');
     assert.isFalse(checkBooking, 'should not contain the new booking in the table');
   });
 });

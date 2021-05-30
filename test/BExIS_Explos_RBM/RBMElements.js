@@ -8,7 +8,6 @@ export default {
   deleteBooking,
   navigationToList,
   unCheck,
-  hasBooking,
   tableContent2D,
   eventContent
 };
@@ -61,11 +60,8 @@ async function createBooking(page, util, elements, assert) {
   // click Calendar icon for a start date
   await page.click('#timePeriod_1 > tr:nth-child(1) > td:nth-child(2) > div > div > span > span');
 
-  // wait for Calendar to be loaded in view model
-  await page.waitForSelector('body > div.t-animation-container', {visible:true});
-
-  // screenshot the visible calendar
-  await page.screenshot({path:'calendarVisibleStart.png'});
+  // wait for calendar container to be visible (margin-top: 0px)
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px');
 
   // click a random day on current month for a start date
   const startDays = await page.$$('body > div.t-animation-container > div > table > tbody > tr > td:not(.t-other-month)');
@@ -74,20 +70,14 @@ async function createBooking(page, util, elements, assert) {
   const randomStartDays = Math.floor(Math.random() * (startDays.length - 2));
   startDays[randomStartDays].click();
 
-  // wait for Calendar to be hidden in view model
-  await page.waitForSelector('body > div.t-animation-container', {visible:false});
-
-  // screenshot the calendar for the start date
-  await page.screenshot({path:'calendarStartDate.png'});
+  // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-316px');
 
   // click Calendar icon for an end date
   await page.click('#timePeriod_1 > tr:nth-child(2) > td:nth-child(2) > div > div > span > span');
 
-  // wait for Calendar is loaded in view model
-  await page.waitForSelector('body > div.t-animation-container', {visible:true});
-
-  // screenshot the visible calendar
-  await page.screenshot({path:'calendarVisibleEnd.png'});
+  // wait for calendar container to be visible (margin-top: 0px)
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px');
 
   // click a random day on current month for an end date
   const endDays = await page.$$('body > div.t-animation-container > div > table > tbody > tr > td:not(.t-other-month)');
@@ -96,11 +86,8 @@ async function createBooking(page, util, elements, assert) {
   const splicedEndDays = endDays.splice(randomStartDays);
   splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
 
-  //  wait for Calendar to be hidden in view model
-  await page.waitForSelector('body > div.t-animation-container', {visible:false});
-
-  // screenshot the calendar for the end date
-  await page.screenshot({path:'calendarEndDate.png'});
+  // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-316px');
 
   // add Reason to the booking
   const reasonSelector = '.fa-plus';
@@ -175,7 +162,7 @@ async function createBooking(page, util, elements, assert) {
  * @param   {object}    assert
  */
 
-async function deleteBooking(page, util, RBMElements, assert) {
+async function deleteBooking(page, util, elements, assert) {
 
   // navigate to "Calendar"
   await util.menu.select(page, 'Calendar');
@@ -231,7 +218,7 @@ async function deleteBooking(page, util, RBMElements, assert) {
   await page.waitForSelector('#history_yes', {visible:true});
 
   // check for an entry by Description Name in the list of bookings
-  const checkBooking= await RBMElements.hasBooking(page, '#resources_table > tbody > tr', 'booking.test.desc');
+  const checkBooking= await elements.hasListing(page, '#resources_table > tbody > tr', 'booking.test.desc');
   assert.isFalse(checkBooking, 'should not contain the new booking in the table');
 }
 
@@ -263,13 +250,6 @@ async function unCheck(page) {
   await page.$$eval('input[type="checkbox"]',
                     checkBoxes => checkBoxes
                       .forEach(checkBox => checkBox.checked = false));
-}
-
-async function hasBooking(page, table, entry){
-  const result =  await page.$$eval(table, (rows, entry) => {
-    return rows.some((tr) => tr.querySelector('td').textContent.trim() == entry);
-  }, entry);
-  return result;
 }
 
 /**
