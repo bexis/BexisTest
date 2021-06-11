@@ -16,7 +16,7 @@ describe('Edit Event', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert), 'should create a new event');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'event.test.name', true), 'should create a new event');
   });
 
   after( async() => {
