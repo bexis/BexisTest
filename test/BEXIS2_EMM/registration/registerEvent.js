@@ -1,14 +1,15 @@
 // After Register Event tests are done,
 // register.event.test.name event has to be removed manually from the database
-// otherwise it will overcrowd the events table with the same name.
+// otherwise it will overcrowd the events table with the same event name
+// which will lead to failing of the Register Event tests.
 
-import Browser from '../../util/Browser';
-import util from '../../util/common';
+import Browser from '../../../util/Browser';
+import util from '../../../util/common';
 import { assert } from 'chai';
-import elements from '../../util/common/elements';
-import EMMElements from './EMMElements';
+import elements from '../../../util/common/elements';
+import EMMElements from '../EMMElements';
 
-describe('Register Event', () => {
+describe.only('Register Event', () => {
 
   before(async () => {
 

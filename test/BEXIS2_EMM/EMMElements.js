@@ -6,7 +6,8 @@
 export default {
   createEvent,
   deleteEvent,
-  registerEvent
+  registerEvent,
+  filterEventByName
 };
 
 /**
@@ -312,5 +313,29 @@ async function registerEvent(page, util, assert) {
 
   assert.equal(editIconClass, 'bx bx-grid-function fa-eye', 'the first element child should have bx bx-grid-function fa-eye class name for edit icon');
   assert.equal(deleteIconClass, 'bx bx-grid-function bx-trash', 'the second element child should have bx bx-grid-function bx-trash class name for delete icon');
+}
 
+/**
+ * Filter event by an event name
+ *
+ * @param   {object}    page
+ * @param   {string}    name
+ */
+
+async function filterEventByName(page, name){
+
+  // wait for filter icon
+  await page.waitForSelector('#Events > table > thead > tr > th:nth-child(2) > div');
+
+  // click the filter icon to filter the events by name
+  await page.click('#Events > table > thead > tr > th:nth-child(2) > div');
+
+  // wait for the first input of the filter container
+  await page.waitForSelector('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)');
+
+  // type the event name in the first field of the filter container
+  await page.type('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)', name);
+
+  // click Filter button to filter the events
+  await page.click('#Events > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button');
 }
