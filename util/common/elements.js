@@ -8,6 +8,7 @@ export default {
   //itemNumber_DataTables : itemNumber_DataTables
   returnTableContent_Telerik,
   returnTableContentPermission_Telerik,
+  tableContent2D,
   returnTableContent_MMM,
   returnMetadataValueContent,
   clickElementByLabelText,
@@ -59,6 +60,24 @@ async function returnTableContent_Telerik( page, tableId ) {
       return Array.from(columns, column => column.innerText);
     });
   }, tableId);
+  return result;
+}
+
+/**
+ * Returns table content in two dimensional array
+ *
+ * @param   {object}    page
+ * @param   {string}    tableID
+ */
+
+async function tableContent2D(page, tableID) {
+  const result = await page.evaluate((tableID) => {
+    const rows = document.querySelectorAll(tableID);
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll('td');
+      return Array.from(columns, column => column.textContent.trim());
+    });
+  }, tableID);
   return result;
 }
 

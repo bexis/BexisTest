@@ -109,7 +109,7 @@ describe('Copy Whole Resource', () => {
     await assert.isFulfilled(RBMElements.navigationToList(page, util), 'should navigate to the list view');
 
     // get the content from resources table in list view
-    const listTableContent = await RBMElements.tableContent2D(page, '#resources_table_wrapper tr');
+    const listTableContent = await elements.tableContent2D(page, '#resources_table_wrapper tr');
 
     // filter the table content elements to make sure that we have the test booking
     const filterTableContent = listTableContent.filter(item => item.includes('booking.test.name'));

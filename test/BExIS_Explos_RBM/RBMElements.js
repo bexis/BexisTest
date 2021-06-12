@@ -8,7 +8,6 @@ export default {
   deleteBooking,
   navigationToList,
   unCheck,
-  tableContent2D,
   eventContent
 };
 
@@ -250,24 +249,6 @@ async function unCheck(page) {
   await page.$$eval('input[type="checkbox"]',
                     checkBoxes => checkBoxes
                       .forEach(checkBox => checkBox.checked = false));
-}
-
-/**
- * Returns table content in two dimensional array
- *
- * @param   {object}    page
- * @param   {string}    tableID
- */
-
-async function tableContent2D(page, tableID) {
-  const result = await page.evaluate((tableID) => {
-    const rows = document.querySelectorAll(tableID);
-    return Array.from(rows, row => {
-      const columns = row.querySelectorAll('td');
-      return Array.from(columns, column => column.textContent.trim());
-    });
-  }, tableID);
-  return result;
 }
 
 /**
