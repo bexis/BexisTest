@@ -16,7 +16,7 @@ describe('Create Booking', () => {
     }
 
     // deletes a booking
-    await assert.isFulfilled(RBMElements.deleteBooking(page, util, RBMElements, assert), 'should delete the new booking');
+    await assert.isFulfilled(RBMElements.deleteBooking(page, util, elements, assert), 'should delete the new booking');
   });
 
   createBookingTest('calendar');
@@ -96,8 +96,8 @@ async function createBookingTest(skipped) {
     // wait for Calendar to be loaded in view model
     await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:true}), 'should wait for calendar');
 
-    // screenshot the visible calendar
-    await page.screenshot({path:'calendarVisibleStart.png'});
+    // wait for calendar container to be visible (margin-top: 0px)
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px'), 'should wait for calendar container to be visible');
 
     // click a random day on current month for a start date
     const startDays = await page.$$('body > div.t-animation-container > div > table > tbody > tr > td:not(.t-other-month)');
@@ -106,20 +106,14 @@ async function createBookingTest(skipped) {
     const randomStartDays = Math.floor(Math.random() * (startDays.length - 2)) + 1;
     startDays[randomStartDays].click();
 
-    // wait for Calendar to be hidden in view model
-    await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:false}), 'should wait for calendar to be hidden');
-
-    // screenshot the calendar for the start date
-    await page.screenshot({path:'calendarStartDate.png'});
+    // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') == '-316px'), 'should wait for calendar container to be hidden');
 
     // click Calendar icon for an end date
     await assert.isFulfilled(page.click('#timePeriod_1 > tr:nth-child(2) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for an end date');
 
-    // wait for Calendar is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:true}), 'should wait for calendar');
-
-    // screenshot the visible calendar
-    await page.screenshot({path:'calendarVisibleEnd.png'});
+    // wait for calendar container to be visible (margin-top: 0px)
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px'), 'should wait for calendar container to be visible');
 
     // click a random day on current month for an end date
     const endDays = await page.$$('body > div.t-animation-container > div > table > tbody > tr > td:not(.t-other-month)');
@@ -138,11 +132,8 @@ async function createBookingTest(skipped) {
     // click a random date in spliced array
     splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
 
-    //  wait for Calendar to be hidden in view model
-    await assert.isFulfilled(page.waitForSelector('body > div.t-animation-container', {visible:false}), 'should wait for calendar to be hidden');
-
-    // screenshot the calendar for the end date
-    await page.screenshot({path:'calendarEndDate.png'});
+    // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-316px'), 'should wait for calendar container to be hidden');
 
     if (!('reason' == skipped)) {
 

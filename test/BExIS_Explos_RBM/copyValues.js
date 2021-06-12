@@ -38,7 +38,7 @@ describe('Copy filled values to all other', () => {
         }
 
         // deletes a booking
-        await assert.isFulfilled(RBMElements.deleteBooking(page, util, RBMElements, assert), 'should delete the new booking');
+        await assert.isFulfilled(RBMElements.deleteBooking(page, util, elements, assert), 'should delete the new booking');
       }
     }
     while (checkActivity);
@@ -54,7 +54,7 @@ describe('Copy filled values to all other', () => {
     }
 
     // deletes a booking
-    await assert.isFulfilled(RBMElements.deleteBooking(page, util, RBMElements, assert), 'should delete the new booking');
+    await assert.isFulfilled(RBMElements.deleteBooking(page, util, elements, assert), 'should delete the new booking');
   });
 
 
@@ -124,9 +124,6 @@ describe('Copy filled values to all other', () => {
     const copyFilled = await page.$$('span[title="Use filled values for all other schedules"]');
     await assert.isFulfilled(copyFilled[0].click(), 'should click copy filled values to other');
 
-    // // screenshot the resources after copying
-    // await assert.isFulfilled(page.screenshot({path:'checkCopiedResources.png'}), 'should screenshot the resources after copying');
-
     // wait for save button to be loaded in the view model
     await assert.isFulfilled(page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(2)'), {visible:true}, 'should wait for the Save button');
 
@@ -140,7 +137,7 @@ describe('Copy filled values to all other', () => {
     await assert.isFulfilled(RBMElements.navigationToList(page, util), 'should navigate to the list view');
 
     // get the content from resources table in list view
-    const listTableContent = await RBMElements.tableContent2D(page, '#resources_table_wrapper tr');
+    const listTableContent = await elements.tableContent2D(page, '#resources_table_wrapper tr');
 
     // filter the table content elements to make sure that we have the test booking
     const filterTableContent = listTableContent.filter(item => item.includes('booking.test.name'));

@@ -3,7 +3,6 @@ import util from '../../util/common';
 import { assert } from 'chai';
 import elements from '../../util/common/elements';
 import RBMElements from './RBMElements';
-// import RBMElements from '../BExIS_Explos_RBM/RBMElements';
 
 describe('Copy Whole Resource', () => {
 
@@ -31,7 +30,7 @@ describe('Copy Whole Resource', () => {
     }
 
     // deletes a booking
-    await assert.isFulfilled(RBMElements.deleteBooking(page, util, RBMElements, assert), 'should delete the new booking');
+    await assert.isFulfilled(RBMElements.deleteBooking(page, util, elements, assert), 'should delete the new booking');
   });
 
   it('should copy a whole resource', async () => {
@@ -110,7 +109,7 @@ describe('Copy Whole Resource', () => {
     await assert.isFulfilled(RBMElements.navigationToList(page, util), 'should navigate to the list view');
 
     // get the content from resources table in list view
-    const listTableContent = await RBMElements.tableContent2D(page, '#resources_table_wrapper tr');
+    const listTableContent = await elements.tableContent2D(page, '#resources_table_wrapper tr');
 
     // filter the table content elements to make sure that we have the test booking
     const filterTableContent = listTableContent.filter(item => item.includes('booking.test.name'));

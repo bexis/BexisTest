@@ -8,6 +8,7 @@ export default {
   //itemNumber_DataTables : itemNumber_DataTables
   returnTableContent_Telerik,
   returnTableContentPermission_Telerik,
+  tableContent2D,
   returnTableContent_MMM,
   returnMetadataValueContent,
   clickElementByLabelText,
@@ -25,9 +26,8 @@ export default {
   clearInputField,
   typeInputField,
   hasEntry,
+  hasListing,
   hasErrors
-
-
 };
 
 
@@ -60,6 +60,24 @@ async function returnTableContent_Telerik( page, tableId ) {
       return Array.from(columns, column => column.innerText);
     });
   }, tableId);
+  return result;
+}
+
+/**
+ * Returns table content in two dimensional array
+ *
+ * @param   {object}    page
+ * @param   {string}    tableID
+ */
+
+async function tableContent2D(page, tableID) {
+  const result = await page.evaluate((tableID) => {
+    const rows = document.querySelectorAll(tableID);
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll('td');
+      return Array.from(columns, column => column.textContent.trim());
+    });
+  }, tableID);
   return result;
 }
 
@@ -331,6 +349,21 @@ async function hasEntry(page, table, entry, tdChild){
   const result =  await page.$$eval(table, (rows, entry, tdChild) => {
     return rows.some((tr) => tr.querySelector(`td:nth-child(${tdChild})`).textContent.trim() == entry);
   }, entry, tdChild);
+  return result;
+}
+
+/**
+ * Check for an entry in a table
+ *
+ * @param {Object} page
+ * @param {string} table
+ * @param {string} entry
+ */
+
+async function hasListing(page, table, entry){
+  const result =  await page.$$eval(table, (rows, entry) => {
+    return rows.some((tr) => tr.querySelector('td').textContent.trim() == entry);
+  }, entry);
   return result;
 }
 

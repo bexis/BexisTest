@@ -10,6 +10,7 @@
     "BEXIS2_Manage_Units": "cross-env TEST_FOLDER='BEXIS2_Manage_Units' mocha --recursive --require @babel/register",
     "BEXIS2_Data_Type": "cross-env TEST_FOLDER='BEXIS2_Data_Type' mocha --recursive --require @babel/register",
     "BExIS_Explos_RBM": "cross-env TEST_FOLDER='BExIS_Explos_RBM' mocha --recursive --require @babel/register",
+    "BEXIS2_EMM": "cross-env TEST_FOLDER='BEXIS2_EMM' mocha --recursive --require @babel/register",
     "BE_LUI": "cross-env TEST_FOLDER='BE/BE_LUI' mocha --recursive --require @babel/register",
     "B2toB1compare_Datasets": "cross-env TEST_FOLDER='B1toB2/B2toB1compare_Datasets' mocha --recursive --require @babel/register > range__test_2020_error_list_new.txt",
     "B2toB1compare_LUI": "cross-env TEST_FOLDER='B1toB2/B2toB1compare_LUI' mocha --recursive --require @babel/register",

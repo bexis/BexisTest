@@ -29,7 +29,7 @@ describe('Edit Booking', () => {
     }
 
     // deletes a booking
-    await assert.isFulfilled(RBMElements.deleteBooking(page, util, RBMElements, assert), 'should delete the new booking');
+    await assert.isFulfilled(RBMElements.deleteBooking(page, util, elements, assert), 'should delete the new booking');
   });
 
   it('should edit a booking', async() => {
@@ -102,9 +102,6 @@ describe('Edit Booking', () => {
       selectCheckbox[randomCheckbox].click();
 
       await assert.isFulfilled(page.screenshot({path:'activities.png'}));
-
-      // // take the Reason content
-      // reasonText = await page.evaluate((randomCheckbox) => document.querySelector(`#Grid_Activities > table > tbody > tr:nth-child(${randomCheckbox}) > td:nth-child(2)`).textContent.trim(), randomCheckbox);
 
       // click Add activities to schedule
       const chooseActivity = await page.waitForSelector('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button');
