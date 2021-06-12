@@ -59,6 +59,12 @@ async function createEvent(page, util, elements, assert, eventName, calendarCond
   // find Event language field
   await page.type('#EventLanguage', 'event.test.lang');
 
+  // wait for Allow edit checkbox field
+  await page.waitForSelector('#EditAllowed');
+
+  // click Allow edit checkbox field
+  await page.click('#EditAllowed');
+
   if(!calendarCondition) {
 
     // get the date of the next day
@@ -311,7 +317,7 @@ async function registerEvent(page, util, assert) {
   const editIconClass = await page.evaluate(() => document.querySelector('#Events > table > tbody > tr:nth-child(1) > td:nth-child(2)').previousSibling.firstElementChild.className.trim());
   const deleteIconClass = await page.evaluate(() => document.querySelector('#Events > table > tbody > tr:nth-child(1) > td:nth-child(2)').previousSibling.lastElementChild.className.trim());
 
-  assert.equal(editIconClass, 'bx bx-grid-function fa-eye', 'the first element child should have bx bx-grid-function fa-eye class name for edit icon');
+  assert.equal(editIconClass, 'bx bx-grid-function bx-edit', 'the first element child should have bx bx-grid-function bx-edit class name for edit icon');
   assert.equal(deleteIconClass, 'bx bx-grid-function bx-trash', 'the second element child should have bx bx-grid-function bx-trash class name for delete icon');
 }
 
