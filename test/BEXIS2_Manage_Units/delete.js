@@ -68,7 +68,7 @@ async function deleteUnitTest(action) {
     // check if the deletion happened or not
     if ('cancel' == action) {
       assert.isTrue(checkEntry, 'should contain the unit in the table');
-    } else if ('deletion' == action) {
+    } else if ('confirm' == action) {
       assert.isFalse(checkEntry, 'should not contain the unit in the table');
     }
   });
