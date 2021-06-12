@@ -1,5 +1,5 @@
-// After Delete Registrations tests are done,
-// register.event.test.name event has to be removed manually from the database
+// After Delete Registrations tests are done, register.event.test.name event
+// has to be removed manually from the database and also from Manage Events
 // otherwise it will overcrowd the events table with the same event name
 // which will lead to failing of the Delete Registrations tests.
 
@@ -48,8 +48,8 @@ async function deleteRegistrationTest(action) {
       await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
     }
 
-    // navigate to "Event Registrations"
-    await assert.isFulfilled(util.menu.select(page, 'Event Registration'), 'should open manage event registration');
+    // navigate to "Event Registration"
+    await assert.isFulfilled(util.menu.select(page, 'Event Registration'), 'should open event registration page');
 
     // filter event by name
     await assert.isFulfilled(EMMElements.filterEventByName(page, 'register.event.test.name'), 'should filter the event by name');

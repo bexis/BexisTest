@@ -1,5 +1,5 @@
-// After Register Event tests are done,
-// register.event.test.name event has to be removed manually from the database
+// After Register Event tests are done, register.event.test.name event
+// has to be removed manually from the database and also from Manage Events
 // otherwise it will overcrowd the events table with the same event name
 // which will lead to failing of the Register Event tests.
 
@@ -9,7 +9,7 @@ import { assert } from 'chai';
 import elements from '../../../util/common/elements';
 import EMMElements from '../EMMElements';
 
-describe.only('Register Event', () => {
+describe('Register Event', () => {
 
   before(async () => {
 
@@ -62,8 +62,8 @@ async function createRegistrationTest(skipped) {
       await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
     }
 
-    // navigate to "Event Registrations"
-    await assert.isFulfilled(util.menu.select(page, 'Event Registration'), 'should open manage event registration');
+    // navigate to "Event Registration"
+    await assert.isFulfilled(util.menu.select(page, 'Event Registration'), 'should open event registration page');
 
     // wait for filter icon
     await assert.isFulfilled(page.waitForSelector('#Events > table > thead > tr > th:nth-child(2) > div'), 'should wait for filter icon of event name');
@@ -144,7 +144,7 @@ async function createRegistrationTest(skipped) {
         await assert.isFulfilled(page.waitForSelector('#\\38 6_27_1_1_1_4_Input'), 'should wait for first name input field');
 
         // type First name
-        await assert.isFulfilled(page.type('#\\38 6_27_1_1_1_4_Input', 'Jane'), 'should type last name');
+        await assert.isFulfilled(page.type('#\\38 6_27_1_1_1_4_Input', 'Jane'), 'should type first name');
       }
 
       if(!('email' == skipped)){
