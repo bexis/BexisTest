@@ -18,10 +18,11 @@ export default {
  * @param   {object}    elements
  * @param   {object}    assert
  * @param   {string}    eventName
+ * @param   {boolean}   editCondition
  * @param   {boolean}   calendarCondition
  */
 
-async function createEvent(page, util, elements, assert, eventName, calendarCondition) {
+async function createEvent(page, util, elements, assert, eventName, editCondition, calendarCondition) {
 
   // navigate to "Manage Events"
   await util.menu.select(page, 'Manage Events');
@@ -59,11 +60,14 @@ async function createEvent(page, util, elements, assert, eventName, calendarCond
   // find Event language field
   await page.type('#EventLanguage', 'event.test.lang');
 
-  // wait for Allow edit checkbox field
-  await page.waitForSelector('#EditAllowed');
+  if (editCondition) {
 
-  // click Allow edit checkbox field
-  await page.click('#EditAllowed');
+    // wait for Allow edit checkbox field
+    await page.waitForSelector('#EditAllowed');
+
+    // click Allow edit checkbox field
+    await page.click('#EditAllowed');
+  }
 
   if(!calendarCondition) {
 
@@ -314,10 +318,7 @@ async function registerEvent(page, util, assert) {
   await page.click('#Events > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button');
 
   // after registration there should be two icons, edit and delete icons, instead of Register button
-  const editIconClass = await page.evaluate(() => document.querySelector('#Events > table > tbody > tr:nth-child(1) > td:nth-child(2)').previousSibling.firstElementChild.className.trim());
   const deleteIconClass = await page.evaluate(() => document.querySelector('#Events > table > tbody > tr:nth-child(1) > td:nth-child(2)').previousSibling.lastElementChild.className.trim());
-
-  assert.equal(editIconClass, 'bx bx-grid-function bx-edit', 'the first element child should have bx bx-grid-function bx-edit class name for edit icon');
   assert.equal(deleteIconClass, 'bx bx-grid-function bx-trash', 'the second element child should have bx bx-grid-function bx-trash class name for delete icon');
 }
 
