@@ -21,7 +21,7 @@ describe('Register Event', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', false), 'should create a new event for registration test');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', true, false), 'should create a new event for registration test');
   });
 
   createRegistrationTest('password');
@@ -65,20 +65,8 @@ async function createRegistrationTest(skipped) {
     // navigate to "Event Registration"
     await assert.isFulfilled(util.menu.select(page, 'Event Registration'), 'should open event registration page');
 
-    // wait for filter icon
-    await assert.isFulfilled(page.waitForSelector('#Events > table > thead > tr > th:nth-child(2) > div'), 'should wait for filter icon of event name');
-
-    // click the filter icon to filter the events by name
-    await assert.isFulfilled(page.click('#Events > table > thead > tr > th:nth-child(2) > div'), 'should click filter icon to filter the events by name');
-
-    // wait for the first input of the filter container
-    await assert.isFulfilled(page.waitForSelector('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)'), 'should wait for the first input field of the filter container');
-
-    // type the event name in the first field of the filter container
-    await assert.isFulfilled(page.type('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)', 'register.event.test.name'), 'should type event name in the first field of the filter container');
-
-    // click Filter button to filter the events
-    await assert.isFulfilled(page.click('#Events > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button'), 'should click filter button');
+    // filter event by name
+    await assert.isFulfilled(EMMElements.filterEventByName(page, 'register.event.test.name'), 'should filter the event by name');
 
     // wait for Register button
     await assert.isFulfilled(page.waitForSelector('#Events > table > tbody > tr > td:nth-child(1) > div'), 'should wait for register button');

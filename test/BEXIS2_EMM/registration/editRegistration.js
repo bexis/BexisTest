@@ -21,7 +21,7 @@ describe('Edit Registration', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', false), 'should create a new event for registration test');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', true, false), 'should create a new event for registration test');
 
     // registers an event
     await assert.isFulfilled(EMMElements.registerEvent(page, util, assert), 'should register an event');
