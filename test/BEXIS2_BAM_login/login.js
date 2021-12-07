@@ -25,8 +25,8 @@ describe( 'Login', () => {
     // submit
     await assert.isFulfilled( page.click( 'input[value="Log in"]' ), 'should click the login button' );
 
-    await assert.isFulfilled( page.waitForSelector( '#search_Components', { visible: true }), 'wait for search page' );
-
+    // await assert.isFulfilled( page.waitForSelector( '#search_Components', { visible: true }), 'wait for search page' );
+    await assert.isFulfilled( page.waitForSelector( Config.browser.loginControlId, { visible: true }), 'wait for search page' );
     await assert.isFulfilled( util.menu.select( page, 'Log Off' ), 'should click the log off button' );
 
   });

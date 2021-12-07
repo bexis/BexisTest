@@ -10,6 +10,10 @@ export default {
     // URL to open at start
     baseURL: 'http://some.url/',
 
+    // ID ti ckec successfully logged in
+    // loginControlId: '#notifications', // explos
+    loginControlId: '#search_Components', // standard B2 instance
+
     // default user
     userNormal: {
       userName: 'USERNAME',
