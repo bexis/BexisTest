@@ -2,7 +2,7 @@ import Browser    from '../../util/Browser';
 import util       from '../../util/common';
 import { assert } from 'chai';
 
-describe( 'Registration', () => {
+describe.skip( 'Registration', () => {
 
   it( 'should show an error when missing username', async () => {
 
@@ -17,7 +17,7 @@ describe( 'Registration', () => {
     await assert.isFulfilled( page.type( '#Password', '123' ),              'should enter an password' );
     await assert.isFulfilled( page.type( '#ConfirmPassword', '123' ),       'should enter an password confirmation' );
     await assert.isFulfilled( page.click( '#TermsAndConditions' ),          'should check terms&conditions' );
-    await assert.isFulfilled( page.click( '#PrivacyPolicy' ),               'should check privacy policy' );
+    //await assert.isFulfilled( page.click( '#PrivacyPolicy' ),               'should check privacy policy' );
 
     // submit
     await assert.isFulfilled( page.click( 'input[value="Register"]' ), 'should click the register button' );
