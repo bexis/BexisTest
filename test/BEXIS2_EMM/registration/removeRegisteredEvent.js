@@ -1,4 +1,5 @@
 import Browser from '../../../util/Browser';
+import Config from '../../../config';
 import util from '../../../util/common';
 import { assert } from 'chai';
 import elements from '../../../util/common/elements';
@@ -16,10 +17,10 @@ describe('Remove Registered Event', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', true, false), 'should create a new event for registration test');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', true, false, Config.emmEmails.emails.primaryEmail, Config.emmEmails.emails.secondaryEmail, Config.emmEmails.emails.primaryEmail), 'should create a new event for registration test');
 
     // registers an event
-    await assert.isFulfilled(EMMElements.registerEvent(page, util, assert), 'should register an event');
+    await assert.isFulfilled(EMMElements.registerEvent(page, util, assert, Config.emmEmails.emails.primaryEmail), 'should register an event');
   });
 
   removeRegisteredEventTest('cancel');
@@ -68,6 +69,9 @@ async function removeRegisteredEventTest(action) {
       await assert.isFulfilled(page.click('body > div.main-content.container-fluid > table > tbody > tr > td:nth-child(3) > div > span'), 'should click delete button');
     }
 
+    // wait for footer image
+    await assert.isFulfilled(page.waitForSelector('#footer > footer > a:nth-child(3) > img'), 'should wait for footer image');
+
     // after clicking delete button, alert box is shown -> click Ok
     if ('confirm' == action) {
       page.on('dialog', async dialog => { await dialog.accept(); });
@@ -78,6 +82,9 @@ async function removeRegisteredEventTest(action) {
         page.click('body > div.main-content.container-fluid > table > tbody > tr > td:nth-child(3) > div > span'),
       ]);
     }
+
+    // wait for footer image
+    await assert.isFulfilled(page.waitForSelector('#footer > footer > a:nth-child(3) > img'), 'should wait for footer image');
 
     // get the list of events from tree view under open
     let treeViewContent = await elements.returnContent(page, '#TreeView > ul > li.t-item.t-first > ul > li > div > a');

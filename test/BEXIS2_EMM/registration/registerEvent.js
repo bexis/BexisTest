@@ -1,4 +1,5 @@
 import Browser from '../../../util/Browser';
+import Config from '../../../config';
 import util from '../../../util/common';
 import { assert } from 'chai';
 import elements from '../../../util/common/elements';
@@ -16,7 +17,7 @@ describe('Register Event', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', true, false), 'should create a new event for registration test');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', true, false, Config.emmEmails.emails.primaryEmail, Config.emmEmails.emails.secondaryEmail, Config.emmEmails.emails.primaryEmail), 'should create a new event for registration test');
   });
 
   after(async () => {
@@ -49,7 +50,7 @@ describe('Register Event', () => {
     }
 
     // registers an event
-    await assert.isFulfilled(EMMElements.registerEvent(page, util, assert), 'should register an event');
+    await assert.isFulfilled(EMMElements.registerEvent(page, util, assert, Config.emmEmails.emails.primaryEmail), 'should register an event');
   });
 });
 
@@ -149,7 +150,7 @@ async function createRegistrationTest(skipped) {
         await assert.isFulfilled(page.waitForSelector('#\\38 7_27_1_1_1_4_Input'), 'should wait for email input field');
 
         // type Email
-        await assert.isFulfilled(page.type('#\\38 7_27_1_1_1_4_Input', 'janedoe@example.com'), 'should type email');
+        await assert.isFulfilled(page.type('#\\38 7_27_1_1_1_4_Input', Config.emmEmails.emails.primaryEmail), 'should type email');
       }
 
       if(!('position' == skipped)){

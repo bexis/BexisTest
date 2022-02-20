@@ -61,6 +61,19 @@ export default {
     // all other settings taken from browser
   },
 
+  /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX EMM MODULE SETTINGS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
+  // For testing the EMM module, a tester must add two existing email addresses.
+  // The email addresses will be used to create an Event and Registration of that event for testing purposes.
+
+  emmEmails: {
+
+    emails: {
+      primaryEmail: 'primary@mail.com',
+      secondaryEmail: 'secondary@mail.com',
+    }
+  },
+
   /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX GENERAL SETTINGS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
   // default timeout for all actions (in ms); "how long can a page.something() call last at most?"

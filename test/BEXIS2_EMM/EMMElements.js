@@ -23,7 +23,7 @@ export default {
  * @param   {boolean}   calendarCondition
  */
 
-async function createEvent(page, util, elements, assert, eventName, editCondition, calendarCondition) {
+async function createEvent(page, util, elements, assert, eventName, editCondition, calendarCondition, emailCC, emailBCC, emailReply) {
 
   // navigate to "Manage Events"
   await util.menu.select(page, 'Manage Events');
@@ -55,11 +55,25 @@ async function createEvent(page, util, elements, assert, eventName, editConditio
   // find Important information field
   await page.type('#ImportantInformation', 'event.test.importantInfo');
 
-  // wait for Event language field
-  await page.waitForSelector('#EventLanguage');
+  // wait for Additional Mail information field
+  await page.waitForSelector('#MailInformation');
 
-  // find Event language field
-  await page.type('#EventLanguage', 'event.test.lang');
+  // find Additional Mail information field
+  await page.type('#MailInformation', 'event.test.addInfo');
+
+  // wait for Selected Event Language field
+  await page.waitForSelector('#SelectedEventLanguage');
+
+  // select only English language for event registration because Deutsch is not working
+  if(!calendarCondition) {
+
+    await page.select('#SelectedEventLanguage', 'English');
+  } else {
+
+    // should select a random event language
+    let selectLang = Math.random() < 0.5 ? 'English' : 'Deutsch';
+    await page.select('#SelectedEventLanguage', selectLang);
+  }
 
   if (editCondition) {
 
@@ -90,7 +104,7 @@ async function createEvent(page, util, elements, assert, eventName, editConditio
   } else {
 
     // click Calendar icon for a Start date
-    await page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(5) > td:nth-child(2) > div > div > span > span');
+    await page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(6) > td:nth-child(2) > div > div > span > span');
 
     // wait for calendar container to be visible (margin-top: 0px)
     await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px');
@@ -106,7 +120,7 @@ async function createEvent(page, util, elements, assert, eventName, editConditio
     await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') !== '0px');
 
     // click Calendar icon for Deadline
-    await page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(6) > td:nth-child(2) > div > div > span > span');
+    await page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(7) > td:nth-child(2) > div > div > span > span');
 
     // wait for calendar container to be visible (margin-top: 0px)
     await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px');
@@ -138,19 +152,19 @@ async function createEvent(page, util, elements, assert, eventName, editConditio
   await page.waitForSelector('#EmailCC');
 
   // find CC email addresses field
-  await page.type('#EmailCC', 'eventCC@example.com');
+  await page.type('#EmailCC', emailCC);
 
   // wait for BCC email addresses field
   await page.waitForSelector('#EmailBCC');
 
   // find BCC email addresses field
-  await page.type('#EmailBCC', 'eventBCC@example.com');
+  await page.type('#EmailBCC', emailBCC);
 
   // wait for Reply to mail address field
   await page.waitForSelector('#EmailReply');
 
   // find Reply to mail address field
-  await page.type('#EmailReply', 'eventReply@example.com');
+  await page.type('#EmailReply', emailReply);
 
   // click Save button
   await Promise.all([
@@ -207,7 +221,7 @@ async function deleteEvent(page, util, assert, elements, eventName) {
  * @param   {object}    assert
  */
 
-async function registerEvent(page, util, assert) {
+async function registerEvent(page, util, assert, emailRegistration) {
 
   // navigate to "Event Registrations"
   await util.menu.select(page, 'Event Registration');
@@ -267,7 +281,7 @@ async function registerEvent(page, util, assert) {
   await page.waitForSelector('#\\38 7_27_1_1_1_4_Input');
 
   // type Email
-  await page.type('#\\38 7_27_1_1_1_4_Input', 'janedoe@example.com');
+  await page.type('#\\38 7_27_1_1_1_4_Input', emailRegistration);
 
   // wait for the arrow icon on Position field
   await page.waitForSelector('#\\38 8_27_1_1_1_4 > table > tbody > tr:nth-child(2) > td.metadataAttributeInput > div > div > span.t-select > span');
