@@ -1,4 +1,5 @@
 import Browser from '../../../util/Browser';
+import Config from '../../../config';
 import util from '../../../util/common';
 import { assert } from 'chai';
 import elements from '../../../util/common/elements';
@@ -16,10 +17,10 @@ describe('Edit Registration', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', true, false), 'should create a new event for registration test');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', true, false, Config.emmEmails.emails.primaryEmail, Config.emmEmails.emails.secondaryEmail, Config.emmEmails.emails.primaryEmail), 'should create a new event for registration test');
 
     // registers an event
-    await assert.isFulfilled(EMMElements.registerEvent(page, util, assert), 'should register an event');
+    await assert.isFulfilled(EMMElements.registerEvent(page, util, assert, Config.emmEmails.emails.primaryEmail), 'should register an event');
   });
 
   after(async () => {
@@ -89,8 +90,11 @@ describe('Edit Registration', () => {
     // wait for Email input field
     await assert.isFulfilled(page.waitForSelector('#\\38 7_27_1_1_1_4_Input'), 'should wait for email input field');
 
+    // clear input field for Email
+    await assert.isFulfilled(elements.clearInputField(page, '#\\38 7_27_1_1_1_4_Input'), 'should clear name input field');
+
     // type Email
-    await assert.isFulfilled(page.type('#\\38 7_27_1_1_1_4_Input', 'edit.'), 'should type email');
+    await assert.isFulfilled(page.type('#\\38 7_27_1_1_1_4_Input', Config.emmEmails.emails.secondaryEmail), 'should type email');
 
     // wait for the arrow icon on Position field
     await assert.isFulfilled(page.waitForSelector('#\\38 8_27_1_1_1_4 > table > tbody > tr:nth-child(2) > td.metadataAttributeInput > div > div > span.t-select > span'), 'should wait for arrow icon on position field');
@@ -133,7 +137,7 @@ describe('Edit Registration', () => {
     await assert.isFulfilled(page.waitForSelector('#Content_Events > div > ul > li > ul > li > div > a.t-link.t-in.event'), 'should wait for the first event in event contents');
 
     // store content which typed manually to edit the registered event
-    const typedEditContent = ['edit.Doe','edit.Jane','edit.janedoe@example.com', 'Postdoc', 'edit.additionalInfo'];
+    const typedEditContent = ['edit.Doe','edit.Jane', Config.emmEmails.emails.secondaryEmail, 'Postdoc', 'edit.additionalInfo'];
 
     // get the content of the edited registered event and store it in a 2D array
     const registrationContent = await elements.tableContent2D(page, 'body > div.main-content.container-fluid > table > tbody > tr > td:nth-child(3)');

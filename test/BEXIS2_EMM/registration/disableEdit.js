@@ -1,4 +1,5 @@
 import Browser from '../../../util/Browser';
+import Config from '../../../config';
 import util from '../../../util/common';
 import { assert } from 'chai';
 import elements from '../../../util/common/elements';
@@ -16,10 +17,10 @@ describe('Disable Edit', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', false, false), 'should create a new event without allow edit');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'register.event.test.name', false, false, Config.emmEmails.emails.primaryEmail, Config.emmEmails.emails.secondaryEmail, Config.emmEmails.emails.primaryEmail), 'should create a new event without allow edit');
 
     // registers an event
-    await assert.isFulfilled(EMMElements.registerEvent(page, util, assert), 'should register an event');
+    await assert.isFulfilled(EMMElements.registerEvent(page, util, assert, Config.emmEmails.emails.primaryEmail), 'should register an event');
   });
 
   after(async () => {

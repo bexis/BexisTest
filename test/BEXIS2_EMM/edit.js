@@ -1,4 +1,5 @@
 import Browser from '../../util/Browser';
+import Config from '../../config';
 import util from '../../util/common';
 import { assert } from 'chai';
 import elements from '../../util/common/elements';
@@ -16,7 +17,7 @@ describe('Edit Event', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'event.test.name', true, true), 'should create a new event');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'event.test.name', true, true, Config.emmEmails.emails.primaryEmail, Config.emmEmails.emails.secondaryEmail, Config.emmEmails.emails.primaryEmail), 'should create a new event');
   });
 
   after( async() => {
@@ -72,11 +73,28 @@ describe('Edit Event', () => {
     // find Important information field
     await assert.isFulfilled(page.type('#ImportantInformation', 'edit.'), 'should enter an important information');
 
-    // wait for Event language field
-    await assert.isFulfilled(page.waitForSelector('#EventLanguage'), 'should wait for event language field');
+    // wait for Additional Mail information field
+    await assert.isFulfilled(page.waitForSelector('#MailInformation'), 'should wait for additional mail information field');
 
-    // find Event language field
-    await assert.isFulfilled(page.type('#EventLanguage', 'edit.'), 'should enter an event language');
+    // find Additional Mail information field
+    await assert.isFulfilled(page.type('#MailInformation', 'edit.event.test.addInfo'), 'should enter an additional mail information');
+
+    // wait for Selected Event Language field
+    await assert.isFulfilled(page.waitForSelector('#SelectedEventLanguage'), 'should wait for selected event language field');
+
+    // get the value of randomly selected event language
+    const langSelector = await page.$('#SelectedEventLanguage');
+    const selectedLang = await (await langSelector.getProperty('value')).jsonValue();
+
+    // edit the event language by switching the selected event language
+    if (selectedLang == 'English') {
+
+      await assert.isFulfilled(page.select('#SelectedEventLanguage', 'Deutsch'), 'should select the German language');
+    }
+    else if (selectedLang == 'Deutsch') {
+
+      await assert.isFulfilled(page.select('#SelectedEventLanguage', 'English'), 'should select the English language');
+    }
 
     // wait for Participants limitation field
     await assert.isFulfilled(page.waitForSelector('#ParticipantsLimitation'), 'should wait for participants limitation field');

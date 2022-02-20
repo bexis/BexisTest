@@ -1,4 +1,5 @@
 import Browser from '../../util/Browser';
+import Config from '../../config';
 import util from '../../util/common';
 import { assert } from 'chai';
 import elements from '../../util/common/elements';
@@ -16,7 +17,7 @@ describe('Delete Event', () => {
     }
 
     // creates an event
-    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'event.test.name', true, true), 'should create a new event');
+    await assert.isFulfilled(EMMElements.createEvent(page, util, elements, assert, 'event.test.name', true, true, Config.emmEmails.emails.primaryEmail, Config.emmEmails.emails.secondaryEmail, Config.emmEmails.emails.primaryEmail), 'should create a new event');
   });
 
   it('should delete an event', async () => {
