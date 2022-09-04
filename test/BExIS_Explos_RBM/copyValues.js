@@ -97,12 +97,21 @@ describe('Copy filled values to all other', () => {
       page.click('#Content_Event > a'),
     ]);
 
-    // wait for the first Select Resource button is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('#Grid_Resource > table > tbody > tr:nth-child(1) > td:nth-child(3) > span', {visible: true}), 'should wait for select resource button');
+    // wait for the Resources table to be loaded is loaded in view model
+    await assert.isFulfilled(page.waitForSelector('#resources', {visible: true}), 'should wait for the resources table');
 
-    // click to add the first two resources from the Available Resources table
-    for (let index = 1; index < 3; index++) {
-      await assert.isFulfilled(page.click(`#Grid_Resource > table > tbody > tr:nth-child(${index}) > td:nth-child(3) > span`), 'should add a second resource to the resource cart');
+    // wait for the first Select Resource button is loaded in view model
+    await assert.isFulfilled(page.waitForSelector('#resourcesTable > tbody > tr:nth-child(1) > td:nth-child(3) > span', {visible: true}), 'should wait for select resource button');
+
+    // wait for Show entries to be loaded is loaded in view model
+    await assert.isFulfilled(page.waitForSelector('#resourcesTable_length', {visible: true}), 'should wait for show entries');
+
+    // select 100 to show 100 entires in the table
+    await assert.isFulfilled(page.select('#resourcesTable_length > label > select', '100'), 'should select 100 entries');
+
+    // click to add two resources which have activities from the Available Resources table
+    for (let index = 35; index < 37; index++) {
+      await assert.isFulfilled(page.click(`#resourcesTable > tbody > tr:nth-child(${index}) > td:nth-child(3) > span`), 'should add a second resource to the resource cart');
     }
 
     // wait for the third resource to appear on Selected Resources cart
@@ -118,7 +127,7 @@ describe('Copy filled values to all other', () => {
     ]);
 
     // wait for Open Calendar icon is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(3)', {visible:true}), 'should wait for open calendar icon');
+    await assert.isFulfilled(page.waitForSelector('#Start_1', {visible:true}), 'should wait for open calendar icon');
 
     // click Copy filled values to other from the first resource
     const copyFilled = await page.$$('span[title="Use filled values for all other schedules"]');
@@ -126,6 +135,8 @@ describe('Copy filled values to all other', () => {
 
     // wait for save button to be loaded in the view model
     await assert.isFulfilled(page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(2)'), {visible:true}, 'should wait for the Save button');
+
+    await assert.isFulfilled(page.waitForTimeout(2000));
 
     // click Save button
     await Promise.all([
