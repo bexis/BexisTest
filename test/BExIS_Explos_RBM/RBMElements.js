@@ -20,7 +20,7 @@ export default {
  * @param   {object}    assert
  */
 
-async function createBooking(page, util, elements, assert) {
+async function createBooking(page, util, elements, assert, resourceType) {
 
   // navigate to "Calendar"
   await util.menu.select(page, 'Calendar');
@@ -34,15 +34,32 @@ async function createBooking(page, util, elements, assert) {
     page.click('#Content_Filter > a'),
   ]);
 
-  // wait for the first Select Resource button is loaded in view model
-  await page.waitForSelector('#Grid_Resource > table > tbody > tr:nth-child(1) > td:nth-child(3) > span', {visible: true});
+  // wait for the Resources table to be loaded is loaded in view model
+  await page.waitForSelector('#resources', {visible: true});
+
+  // wait for Show entries to be loaded is loaded in view model
+  await page.waitForSelector('#resourcesTable_length', {visible: true});
+
+  // select 100 to show 100 entires in the table
+  await page.select('#resourcesTable_length > label > select', '100');
 
   // get a random Resource
   const resourceSelect = await page.$$('span[title="Select resource"]');
   const randomResourceSelector = Math.floor(Math.random() * resourceSelect.length) + 1;
 
-  // click a random Resource
-  await page.click(`#Grid_Resource > table > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(3) > span`);
+  // get Max info for the selected resource
+  const maxNumber = await page.$eval(`#resourcesTable > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(2)`, (el) => el.textContent.trim(), randomResourceSelector);
+
+  if (resourceType === 'any') {
+
+    // click a random Resource
+    await page.click(`#resourcesTable > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(3) > span`);
+
+  } else if (resourceType === 'no limitation') {
+
+    // click a non random resource with "no limitation"
+    await page.click('#resourcesTable > tbody > tr:nth-child(50) > td:nth-child(3) > span');
+  }
 
   // wait for Continue Booking button is loaded in view model
   await page.waitForSelector('#ResourceCart > a', {visible:true});
@@ -67,10 +84,10 @@ async function createBooking(page, util, elements, assert) {
 
   // startDays.length - 2 --> it is for a gap between start and end date
   const randomStartDays = Math.floor(Math.random() * (startDays.length - 2));
-  startDays[randomStartDays].click();
+  await startDays[randomStartDays].click();
 
   // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
-  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-316px');
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-320px');
 
   // click Calendar icon for an end date
   await page.click('#timePeriod_1 > tr:nth-child(2) > td:nth-child(2) > div > div > span > span');
@@ -83,17 +100,17 @@ async function createBooking(page, util, elements, assert) {
 
   // remove days until the start date for not picking a past date
   const splicedEndDays = endDays.splice(randomStartDays);
-  splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
+  await splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
 
   // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
-  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-316px');
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-320px');
 
   // add Reason to the booking
-  const reasonSelector = '.fa-plus';
-  if (await page.$(reasonSelector) !== null) {
+  const reasonSelector = '#scheduleDetails_1 > table > tbody > tr:nth-child(7) > td:nth-child(2) > span';
+  if (await maxNumber === 'no limitation') {
 
     // click add reason button
-    await page.click('.fa-plus');
+    await page.click(reasonSelector);
 
     // wait for Select Activities window is loaded in view model
     await page.waitForSelector('#Window_ChooseActivities', {visible:true});
@@ -101,7 +118,9 @@ async function createBooking(page, util, elements, assert) {
     // click a random checkbox for Select column
     const selectCheckbox = await page.$$('input[type="checkbox"]');
     const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length) + 1;
-    selectCheckbox[randomCheckbox].click();
+
+    await page.waitForTimeout(500);
+    await selectCheckbox[randomCheckbox].click();
 
     // click Add activities to schedule
     await page.click('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button');
@@ -116,14 +135,16 @@ async function createBooking(page, util, elements, assert) {
   // find Description field
   await page.type('#Description', 'booking.test.desc');
 
-  // screenshot the the window before clicking book
-  await page.screenshot({path:'beforeLast.png'});
-
   // click Book button
   await Promise.all([
     page.waitForNavigation(),
     page.click('#Content_Event > div.bx-footer.right > a:nth-child(2)'),
   ]);
+
+  await page.waitForTimeout(2000);
+
+  // wait for Month button to appear
+  await page.waitForSelector('#calendar > div.fc-toolbar > div.fc-right > div > button.fc-month-button.fc-button.fc-state-default.fc-corner-left');
 
   // click Month button
   await page.click('#calendar > div.fc-toolbar > div.fc-right > div > button.fc-month-button.fc-button.fc-state-default.fc-corner-left');

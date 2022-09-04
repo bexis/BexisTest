@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import Browser from '../../util/Browser';
 import util from '../../util/common';
 import { assert } from 'chai';
@@ -81,14 +82,14 @@ describe('Edit Booking', () => {
     // wait for Calendar icon is loaded in view model
     await assert.isFulfilled(page.waitForSelector('#timePeriod_1 > tr:nth-child(1) > td:nth-child(2) > div > div > span > span', {visible:true}), 'should wait for calendar icon');
 
+    console.log('Passed Clicking Edit...');
     // edit Reason
-    // let reasonText;
     const reasonSelector = '.fa-plus';
     if (await page.$(reasonSelector) !== null) {
 
       //click to remove activity
-      const removeActivity = await page.waitForSelector('#removeActivity');
-      await assert.isFulfilled(removeActivity.click(), 'should remove an activity');
+      await assert.isFulfilled(page.waitForSelector('#removeActivity'), 'should wait remove icon');
+      await assert.isFulfilled(page.click('#removeActivity'), 'should remove an activity');
 
       // click add reason button
       await assert.isFulfilled(page.click('.fa-plus'), 'should click add reason button');
@@ -104,12 +105,14 @@ describe('Edit Booking', () => {
       await assert.isFulfilled(page.screenshot({path:'activities.png'}));
 
       // click Add activities to schedule
-      const chooseActivity = await page.waitForSelector('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button');
-      await assert.isFulfilled(chooseActivity.click(), 'should click add activities button to schedule');
+      await assert.isFulfilled(page.waitForSelector('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button'), 'should wait for the add activities to schedule button');
+      await assert.isFulfilled(page.click('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button'), 'should click add activities to schedule button');
 
       // wait for remove activity to be found in view model
       await assert.isFulfilled(page.waitForSelector('#removeActivity', {visible:true}), 'should wait for remove activity icon to be visible');
     }
+
+    console.log('Passed Editing Reason...');
 
     // wait for Name input
     await assert.isFulfilled(page.waitForSelector('#Name'), 'should wait for name input');
@@ -130,6 +133,8 @@ describe('Edit Booking', () => {
       page.waitForNavigation(),
       page.click('#Content_Event > div.bx-footer.right > a:nth-child(2)'),
     ]);
+
+    console.log('Passed Saving...');
 
     // click Month button
     await assert.isFulfilled(page.click('#calendar > div.fc-toolbar > div.fc-right > div > button.fc-month-button.fc-button.fc-state-default.fc-corner-left'));

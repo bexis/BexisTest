@@ -68,15 +68,32 @@ async function createBookingTest(skipped) {
       page.click('#Content_Filter > a'),
     ]);
 
-    // wait for the first Select Resource button is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('#Grid_Resource > table > tbody > tr:nth-child(1) > td:nth-child(3) > span', {visible: true}), 'should wait for select resource button');
+    // wait for the Resources table to be loaded is loaded in view model
+    await assert.isFulfilled(page.waitForSelector('#resources', {visible: true}), 'should wait for the resources table');
+
+    // wait for Show entries to be loaded is loaded in view model
+    await assert.isFulfilled(page.waitForSelector('#resourcesTable_length', {visible: true}), 'should wait for show entries');
+
+    // select 100 to show 100 entires in the table
+    await assert.isFulfilled(page.select('#resourcesTable_length > label > select', '100'), 'should select 100 entries');
 
     // get a random Resource
     const resourceSelect = await page.$$('span[title="Select resource"]');
-    const randomResourceSelector= Math.floor(Math.random() * resourceSelect.length) + 1;
+    let randomResourceSelector = Math.floor(Math.random() * resourceSelect.length) + 1;
+
+    // get Max info for the selected resource
+    const maxNumber = await page.$eval(`#resourcesTable > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(2)`, (el) => el.textContent.trim(), randomResourceSelector);
+
+    if (('reason' == skipped) && maxNumber !== 'no limitation') {
+
+      await assert.isFulfilled(page.waitForSelector('#resourcesTable_filter > label > input[type=search]'), 'should wait for show entries');
+      await assert.isFulfilled(page.type('#resourcesTable_filter > label > input[type=search]', 'no limitation'), 'should search for the "no limitation keyword"');
+
+      randomResourceSelector = 1;
+    }
 
     // click a random Resource
-    await assert.isFulfilled(page.click(`#Grid_Resource > table > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(3) > span`), 'should click a random resource');
+    await assert.isFulfilled(page.click(`#resourcesTable > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(3) > span`), 'should click a random resource');
 
     // wait for Continue Booking button is loaded in view model
     await assert.isFulfilled(page.waitForSelector('#ResourceCart > a', {visible:true}), 'should wait for continue booking button');
@@ -104,10 +121,10 @@ async function createBookingTest(skipped) {
 
     // startDays.length - 2 --> it is for a gap between start and end date
     const randomStartDays = Math.floor(Math.random() * (startDays.length - 2)) + 1;
-    startDays[randomStartDays].click();
+    await startDays[randomStartDays].click();
 
     // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
-    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') == '-316px'), 'should wait for calendar container to be hidden');
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') == '-320px'), 'should wait for calendar container to be hidden');
 
     // click Calendar icon for an end date
     await assert.isFulfilled(page.click('#timePeriod_1 > tr:nth-child(2) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for an end date');
@@ -130,19 +147,19 @@ async function createBookingTest(skipped) {
     }
 
     // click a random date in spliced array
-    splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
+    await splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
 
     // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
-    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-316px'), 'should wait for calendar container to be hidden');
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-320px'), 'should wait for calendar container to be hidden');
 
     if (!('reason' == skipped)) {
 
       // add Reason to the booking
-      const reasonSelector = '.fa-plus';
-      if (await page.$(reasonSelector) !== null) {
+      const reasonSelector = '#scheduleDetails_1 > table > tbody > tr:nth-child(7) > td:nth-child(2) > span';
+      if (maxNumber === 'no limitation') {
 
         // click add reason button
-        await assert.isFulfilled(page.click('.fa-plus'), 'should click add reason button');
+        await assert.isFulfilled(page.click(reasonSelector), 'should click add reason button');
 
         // wait for Select Activities window is loaded in view model
         await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {visible:true}), 'should wait for select activities window');
@@ -150,6 +167,11 @@ async function createBookingTest(skipped) {
         // click a random checkbox for Select column
         const selectCheckbox = await page.$$('input[type="checkbox"]');
         const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length) + 1;
+
+        // wait for the selected checkbox
+        await assert.isFulfilled(page.waitForSelector('#checkboxesUserSelect'), 'should wait for the checkbox');
+
+        await page.waitForTimeout(500);
         selectCheckbox[randomCheckbox].click();
 
         // click Add activities to schedule
@@ -161,7 +183,7 @@ async function createBookingTest(skipped) {
     }
 
     // it should skip name when it is testing for reason too because there are resources that don't include reason
-    if (!('reason' == skipped) && !('name' == skipped)) {
+    if (!('name' == skipped)) {
 
       // wait for Name input
       await assert.isFulfilled(page.waitForSelector('#Name'), 'should wait for name input');
@@ -178,9 +200,6 @@ async function createBookingTest(skipped) {
       // find Description field
       await assert.isFulfilled(page.type('#Description', 'booking.test.desc'), 'should enter a description');
     }
-
-    // screenshot the the window before clicking book
-    await page.screenshot({path:'beforeLast.png'});
 
     // wait for Book button
     await assert.isFulfilled(page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(2)'), 'should wait for book button');

@@ -16,9 +16,8 @@ describe('Copy Whole Resource', () => {
     }
 
     // books a resource
-    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert), 'should book a new resource');
+    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert, 'no limitation'), 'should book a new resource');
   });
-
 
   after( async() => {
 
@@ -64,6 +63,9 @@ describe('Copy Whole Resource', () => {
     // wait for Month button to be active
     await assert.isFulfilled(page.waitForFunction(() => !!document.querySelector('#calendar > div.fc-toolbar > div.fc-right > div > button.fc-month-button.fc-button.fc-state-default.fc-corner-left.fc-state-active')), 'should wait for month button to be active');
 
+    // eslint-disable-next-line no-console
+    console.log('Booking: Passed navigation to month view...');
+
     // wait for Calendar to appear
     await assert.isFulfilled(page.waitForSelector('#calendar .fc-event'), 'should wait for calendar');
 
@@ -95,6 +97,8 @@ describe('Copy Whole Resource', () => {
     // click Copy whole resource
     const copyFilled = await page.$$('span[title="Copy the whole resource schedule"]');
     await assert.isFulfilled(copyFilled[0].click(), 'should click copy whole resource');
+
+    await page.waitForTimeout(500);
 
     // wait for Save button is loaded in view model
     await assert.isFulfilled(page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(2)', {visible:true}), 'should wait for save button to appear');

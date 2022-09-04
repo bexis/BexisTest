@@ -88,10 +88,10 @@ describe('Delete a Resource from Booking', () => {
     ]);
 
     // wait for the first Select Resource button is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('#Grid_Resource > table > tbody > tr:nth-child(1) > td:nth-child(3) > span', {visible: true}), 'should wait for select resource button');
+    await assert.isFulfilled(page.waitForSelector('#resourcesTable > tbody > tr:nth-child(1) > td:nth-child(3) > span', {visible: true}), 'should wait for select resource button');
 
     // click to add the first resource from the Available Resources table
-    await assert.isFulfilled(page.click('#Grid_Resource > table > tbody > tr:nth-child(1) > td:nth-child(3) > span'), 'should add a second resource to the resource cart');
+    await assert.isFulfilled(page.click('#resourcesTable > tbody > tr:nth-child(1) > td:nth-child(3) > span'), 'should add a second resource to the resource cart');
 
     // wait for the second resource to appear on Selected Resources cart
     await assert.isFulfilled(page.waitForSelector('#ResourceCart > div > table > tbody > tr:nth-child(3) > td', {visible: true}), 'should wait for the second resource to appear on the resources cart');
@@ -106,54 +106,28 @@ describe('Delete a Resource from Booking', () => {
     ]);
 
     // wait for Open Calendar icon is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('#Content_Event > div.bx-footer.right > a:nth-child(3)', {visible:true}), 'should wait for open calendar icon');
+    await assert.isFulfilled(page.waitForSelector('#Start_1', {visible:true}), 'should wait for open calendar icon');
 
     // click Copy filled values to other from the first resource
     const copyFilled = await page.$$('span[title="Use filled values for all other schedules"]');
     copyFilled[0].click();
 
     // -----> needs better solution
-    await assert.isFulfilled(page.waitFor(1000));
+    await assert.isFulfilled(page.waitForTimeout(2000));
 
     // wait for the second resource header and click it
-    await assert.isFulfilled(page.waitForXPath('//*[@id="4"]').then(selector => selector.click()), 'should wait for expansion button then click it');
+    await assert.isFulfilled(page.waitForSelector('#Content_Event > div:nth-child(4) > div.itemHeader').then(selector => selector.click()), 'should wait for expansion button then click it');
 
-    // wait for class name to change into .fa-angle-double-down after the click
-    await assert.isFulfilled(page.waitForSelector('#\\34 .bx.fa-angle-double-down'), 'should wait for the selector');
+    await assert.isFulfilled(page.waitForFunction(() => document.querySelector('#\\34 .bx.fa-angle-double-down')), 'wait for arrow icon to be down');
 
     // wait for the second resource details to expand
     await assert.isFulfilled(page.waitForSelector('#scheduleDetails_4', {visible:true}), 'should wait for the second resource window to expand');
-
-    // wait for Open Calendar icon is loaded in view model
-    await assert.isFulfilled(page.waitForSelector('#activityList'), 'should wait for open calendar icon');
-    const ulContext = await page.$eval('#activityList', (el) => el.textContent.trim());
-
-    // add an activity if the activity list is empty
-    if (ulContext === '') {
-
-      // click add reason button
-      await assert.isFulfilled(page.click('.fa-plus'), 'should click add reason button');
-
-      // wait for Select Activities window is loaded in view model
-      await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {visible:true}), 'should wait for select activities window');
-
-      // click a random checkbox for Select column
-      const selectCheckbox = await page.$$('input[type="checkbox"]');
-      const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length) + 1;
-      selectCheckbox[randomCheckbox].click();
-
-      // click Add activities to schedule
-      await assert.isFulfilled(page.click('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button'), 'should click add activities button to schedule');
-
-      // wait for Select Activities window is not found in view model
-      await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {hidden:true}), 'should wait for select activities window to be hidden');
-    }
 
     // get name of the second resource
     const secondResText = await page.$eval('#Content_Event > div:nth-child(4) > div.itemHeader > b', (el) => el.textContent.trim());
 
     // check if the second resource is added to the booking
-    assert.strictEqual(secondResText, 'Forest - all EPs (SCH)', 'the second resource should be Forest - all EPs (SCH)');
+    assert.strictEqual(secondResText, 'Binocular (ALB)', 'the second resource should be Binocular (ALB)');
 
     // wait for delete icons on the resources
     await assert.isFulfilled(page.waitForSelector('span[title="Remove schedule from event"]'), 'should wait for delete icons');
