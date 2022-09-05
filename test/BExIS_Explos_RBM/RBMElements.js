@@ -47,9 +47,6 @@ async function createBooking(page, util, elements, assert, resourceType) {
   const resourceSelect = await page.$$('span[title="Select resource"]');
   const randomResourceSelector = Math.floor(Math.random() * resourceSelect.length) + 1;
 
-  // get Max info for the selected resource
-  const maxNumber = await page.$eval(`#resourcesTable > tbody > tr:nth-child(${randomResourceSelector}) > td:nth-child(2)`, (el) => el.textContent.trim(), randomResourceSelector);
-
   if (resourceType === 'any') {
 
     // click a random Resource
@@ -57,8 +54,10 @@ async function createBooking(page, util, elements, assert, resourceType) {
 
   } else if (resourceType === 'no limitation') {
 
-    // click a non random resource with "no limitation"
-    await page.click('#resourcesTable > tbody > tr:nth-child(50) > td:nth-child(3) > span');
+    // filter and click a non random resource with "no limitation"
+    await page.waitForSelector('#resourcesTable_filter > label > input[type=search]');
+    await page.type('#resourcesTable_filter > label > input[type=search]', 'no limitation');
+    await page.click('#resourcesTable > tbody > tr:nth-child(1) > td:nth-child(3) > span');
   }
 
   // wait for Continue Booking button is loaded in view model
@@ -105,12 +104,14 @@ async function createBooking(page, util, elements, assert, resourceType) {
   // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
   await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-320px');
 
+  // get the total rows for a resource table to distinguish from 'no limitation' type
+  const totalRows = await page.$$('.itemContent > table > tbody > tr');
+
   // add Reason to the booking
-  const reasonSelector = '#scheduleDetails_1 > table > tbody > tr:nth-child(7) > td:nth-child(2) > span';
-  if (await maxNumber === 'no limitation') {
+  if (totalRows.length == 8) {
 
     // click add reason button
-    await page.click(reasonSelector);
+    await page.click('#scheduleDetails_1 > table > tbody > tr:nth-child(7) > td:nth-child(2) > span');
 
     // wait for Select Activities window is loaded in view model
     await page.waitForSelector('#Window_ChooseActivities', {visible:true});
@@ -118,8 +119,7 @@ async function createBooking(page, util, elements, assert, resourceType) {
     // click a random checkbox for Select column
     const selectCheckbox = await page.$$('input[type="checkbox"]');
     const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length) + 1;
-
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(2000);
     await selectCheckbox[randomCheckbox].click();
 
     // click Add activities to schedule

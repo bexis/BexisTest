@@ -16,7 +16,7 @@ describe('Delete Booking', () => {
     }
 
     // books a resource
-    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert), 'should book a new resource');
+    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert, 'any'), 'should book a new resource');
   });
 
   it('should delete a booking', async () => {

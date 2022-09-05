@@ -34,7 +34,7 @@ describe('Create Booking', () => {
     }
 
     // books a resource
-    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert), 'should book a new resource');
+    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert, 'any'), 'should book a new resource');
   });
 });
 
@@ -170,8 +170,7 @@ async function createBookingTest(skipped) {
 
         // wait for the selected checkbox
         await assert.isFulfilled(page.waitForSelector('#checkboxesUserSelect'), 'should wait for the checkbox');
-
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(2000);
         selectCheckbox[randomCheckbox].click();
 
         // click Add activities to schedule

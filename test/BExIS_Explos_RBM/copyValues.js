@@ -8,40 +8,15 @@ describe('Copy filled values to all other', () => {
 
   before(async () => {
 
-    // book a resource with an activity
-    let checkActivity = true;
-    do {
-      const page = await Browser.openTab();
+    const page = await Browser.openTab();
 
-      // make sure we are logged in
-      if( !(await util.login.isLoggedIn(page)) ) {
-        await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
-      }
-
-      // books a resource
-      await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert), 'should book a new resource');
-
-      // navigate to list view
-      await assert.isFulfilled(RBMElements.navigationToList(page, util), 'should navigate to the list view');
-
-      // check for an entry by Description Name in the list of bookings
-      checkActivity = await elements.hasEntry(page, '#resources_table > tbody > tr', '', '9');
-
-      // delete a booking if it doesn't have an activity
-      if (checkActivity) {
-
-        const page = await Browser.openTab();
-
-        // make sure we are logged in
-        if( !(await util.login.isLoggedIn(page)) ) {
-          await assert.isFulfilled(util.login.loginUser(page), 'should log in');
-        }
-
-        // deletes a booking
-        await assert.isFulfilled(RBMElements.deleteBooking(page, util, elements, assert), 'should delete the new booking');
-      }
+    // make sure we are logged in
+    if( !(await util.login.isLoggedIn(page)) ) {
+      await assert.isFulfilled( util.login.loginUser(page), 'should log in' );
     }
-    while (checkActivity);
+
+    // books a resource
+    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert, 'no limitation'), 'should book a new resource');
   });
 
   after( async() => {

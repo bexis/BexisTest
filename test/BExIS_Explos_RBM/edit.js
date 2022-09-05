@@ -17,7 +17,7 @@ describe('Edit Booking', () => {
     }
 
     // books a resource
-    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert), 'should book a new resource');
+    await assert.isFulfilled(RBMElements.createBooking(page, util, elements, assert, 'no limitation'), 'should book a new resource');
   });
 
   after( async() => {
@@ -83,34 +83,31 @@ describe('Edit Booking', () => {
     await assert.isFulfilled(page.waitForSelector('#timePeriod_1 > tr:nth-child(1) > td:nth-child(2) > div > div > span > span', {visible:true}), 'should wait for calendar icon');
 
     console.log('Passed Clicking Edit...');
-    // edit Reason
-    const reasonSelector = '.fa-plus';
-    if (await page.$(reasonSelector) !== null) {
 
-      //click to remove activity
-      await assert.isFulfilled(page.waitForSelector('#removeActivity'), 'should wait remove icon');
-      await assert.isFulfilled(page.click('#removeActivity'), 'should remove an activity');
+    //click to remove activity
+    await assert.isFulfilled(page.waitForSelector('#removeActivity'), 'should wait remove icon');
+    await assert.isFulfilled(page.click('#removeActivity'), 'should remove an activity');
 
-      // click add reason button
-      await assert.isFulfilled(page.click('.fa-plus'), 'should click add reason button');
+    // click add reason button
+    await assert.isFulfilled(page.waitForSelector('#scheduleDetails_1 > table > tbody > tr:nth-child(7) > td:nth-child(2) > span'), 'should wait remove icon');
+    await assert.isFulfilled(page.click('#scheduleDetails_1 > table > tbody > tr:nth-child(7) > td:nth-child(2) > span'), 'should click add reason button');
 
-      // wait for Select Activities window is loaded in view model
-      await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {visible:true}), 'should wait for select activities window');
+    // wait for Select Activities window is loaded in view model
+    await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {visible:true}), 'should wait for select activities window');
 
-      // click a random checkbox for Select column
-      const selectCheckbox = await page.$$('input[type="checkbox"]');
-      const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length) + 1;
-      selectCheckbox[randomCheckbox].click();
+    // click a random checkbox for Select column
+    const selectCheckbox = await page.$$('input[type="checkbox"]');
+    const randomCheckbox = Math.floor(Math.random() * selectCheckbox.length) + 1;
+    await page.waitForTimeout(2000);
+    selectCheckbox[randomCheckbox].click();
 
-      await assert.isFulfilled(page.screenshot({path:'activities.png'}));
+    await assert.isFulfilled(page.screenshot({path:'activities.png'}));
 
-      // click Add activities to schedule
-      await assert.isFulfilled(page.waitForSelector('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button'), 'should wait for the add activities to schedule button');
-      await assert.isFulfilled(page.click('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button'), 'should click add activities to schedule button');
+    // click Add activities to schedule
+    await assert.isFulfilled(page.click('#Content_ChooseActivities > div > div.bx-rpm-submit.bx-rpm-buttons > button'), 'should click add activities to schedule button');
 
-      // wait for remove activity to be found in view model
-      await assert.isFulfilled(page.waitForSelector('#removeActivity', {visible:true}), 'should wait for remove activity icon to be visible');
-    }
+    // wait for Select Activities window is not found in view model
+    await assert.isFulfilled(page.waitForSelector('#Window_ChooseActivities', {hidden:true}), 'should wait for select activities window to be hidden');
 
     console.log('Passed Editing Reason...');
 
@@ -134,10 +131,11 @@ describe('Edit Booking', () => {
       page.click('#Content_Event > div.bx-footer.right > a:nth-child(2)'),
     ]);
 
-    console.log('Passed Saving...');
+    await page.waitForTimeout(2000);
 
     // click Month button
-    await assert.isFulfilled(page.click('#calendar > div.fc-toolbar > div.fc-right > div > button.fc-month-button.fc-button.fc-state-default.fc-corner-left'));
+    await assert.isFulfilled(page.waitForSelector('#calendar > div.fc-toolbar > div.fc-right > div > button.fc-month-button.fc-button.fc-state-default.fc-corner-left', {visible:true}), 'should wait for month button to become visible');
+    await assert.isFulfilled(page.click('#calendar > div.fc-toolbar > div.fc-right > div > button.fc-month-button.fc-button.fc-state-default.fc-corner-left'), 'should click month button');
 
     // wait for Calendar to appear
     await assert.isFulfilled(page.waitForSelector('#calendar .fc-event'), 'should wait for calendar event to appear');
