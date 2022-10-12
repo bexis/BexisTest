@@ -126,8 +126,8 @@ async function createEventTest(skipped) {
     const randomStartDays = Math.floor(Math.random() * (startDays.length - 2)) + 1;
     startDays[randomStartDays].click();
 
-    // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
-    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-316px'), 'should wait for calendar container to be hidden');
+    // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -320px)
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') !=='0px'), 'should wait for calendar container to be hidden');
 
     // click Calendar icon for Deadline
     await assert.isFulfilled(page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(7) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for deadline');
@@ -153,7 +153,7 @@ async function createEventTest(skipped) {
     splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
 
     // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
-    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-316px'), 'should wait for calendar container to be hidden');
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') !=='0px'), 'should wait for calendar container to be hidden');
 
     // wait for Participants limitation field
     await assert.isFulfilled(page.waitForSelector('#ParticipantsLimitation'), 'should wait for participants limitation field');

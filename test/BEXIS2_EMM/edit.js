@@ -49,10 +49,10 @@ describe('Edit Event', () => {
     await assert.isFulfilled(page.waitForSelector('body > div.main-content.container-fluid > table > tbody > tr > td > div > a', { visible: true }), 'should wait for button create new event');
 
     // wait for the edit icon
-    await assert.isFulfilled(page.waitForSelector('div[title="Edit Unit \\"event.test.name\\""]'), 'should wait for the edit icon');
+    await assert.isFulfilled(page.waitForSelector('div[title="Edit event \\"event.test.name\\""]'), 'should wait for the edit icon');
 
     // click Edit icon
-    const editButton = await page.$('div[title="Edit Unit \\"event.test.name\\""]');
+    const editButton = await page.$('div[title="Edit event \\"event.test.name\\""]');
     await editButton.click();
 
     // wait for Event name field
@@ -108,11 +108,11 @@ describe('Edit Event', () => {
       page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > div > button'),
     ]);
 
-    // wait for Event table is loaded in view model
-    await page.waitForSelector('#Grid_Event > table > tbody > tr > td:nth-child(2)');
+    // wait for the events table
+    await assert.isFulfilled(page.waitForSelector('#events > tbody > tr > td'), 'should wait for the events table');
 
     // check for an entry by Event name in the list of events
-    const checkEntry = await elements.hasEntry(page, '#Grid_Event > table > tbody > tr', 'edit.event.test.name', '2');
+    const checkEntry = await elements.hasEntry(page, '#events > tbody > tr', 'edit.event.test.name', '2');
     assert.isTrue(checkEntry, 'should contain the new event in the table');
   });
 });

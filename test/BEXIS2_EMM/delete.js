@@ -36,17 +36,17 @@ describe('Delete Event', () => {
     await assert.isFulfilled(page.waitForSelector('body > div.main-content.container-fluid > table > tbody > tr > td > div > a', { visible: true }), 'should wait for button create new event');
 
     // wait for the delete icon
-    await assert.isFulfilled(page.waitForSelector('div[title="Delete Unit \\"event.test.name\\""]'), 'should wait for the delete icon');
+    await assert.isFulfilled(page.waitForSelector('div[title="Delete event \\"event.test.name\\""]'), 'should wait for the delete icon');
 
     // click Delete icon
-    const deleteButton = await page.$('div[title="Delete Unit \\"event.test.name\\""]');
+    const deleteButton = await page.$('div[title="Delete event \\"event.test.name\\""]');
     await deleteButton.click();
 
-    // wait for the delete icon to be removed
-    await assert.isFulfilled(page.waitForFunction(() => !document.querySelector('div[title="Delete Unit \\"event.test.name\\""]')), 'wait for the delete button to be null');
+    // wait for the events table
+    await assert.isFulfilled(page.waitForSelector('#events > tbody > tr > td'), 'should wait for the events table');
 
     // check for an entry by Event name in the list of events to see if it is deleted
-    const checkEntry = await elements.hasListing(page, '#Grid_Event > table > tbody > tr', 'event.test.name');
+    const checkEntry = await elements.hasListing(page, '#events > tbody > tr', 'event.test.name');
     assert.isFalse(checkEntry, 'should not contain the new event in the table');
   });
 });
