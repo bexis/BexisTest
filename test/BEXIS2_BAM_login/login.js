@@ -6,7 +6,7 @@ import login from '../../util/common/login';
 
 describe( 'Login', () => {
 
-  it( 'should show an error when login with user name was not succesfull', async () => {
+  it( 'should show an error when login with user name was not successful', async () => {
 
     // get a tab
     const page = await Browser.openTab();

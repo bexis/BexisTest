@@ -173,10 +173,10 @@ async function createEvent(page, util, elements, assert, eventName, editConditio
   ]);
 
   // wait for Event table is loaded in view model
-  await page.waitForSelector('#Grid_Event > table > tbody > tr > td:nth-child(2)');
+  await page.waitForSelector('#events > tbody > tr');
 
   // check for an entry by Event name in the list of events
-  const checkEntry = await elements.hasEntry(page, '#Grid_Event > table > tbody > tr', eventName, '2');
+  const checkEntry = await elements.hasEntry(page, '#events > tbody > tr', eventName, '2');
   assert.isTrue(checkEntry, 'should contain the new event in the table');
 }
 
@@ -199,17 +199,17 @@ async function deleteEvent(page, util, assert, elements, eventName) {
   await page.waitForSelector('body > div.main-content.container-fluid > table > tbody > tr > td > div > a', { visible: true });
 
   // wait for the delete icon
-  await page.waitForSelector(`div[title="Delete Unit \\"${eventName}\\""]`);
+  await page.waitForSelector(`div[title="Delete event \\"${eventName}\\""]`);
 
   // click Delete button
-  const deleteButton = await page.$(`div[title="Delete Unit \\"${eventName}\\""]`);
+  const deleteButton = await page.$(`div[title="Delete event \\"${eventName}\\""]`);
   await deleteButton.click();
 
-  // wait for the delete button to be removed
-  await page.waitForFunction((eventName) => !document.querySelector(`div[title="Delete Unit \\"${eventName}\\""]`));
+  // wait for the events table
+  await assert.isFulfilled(page.waitForSelector('#events > tbody > tr > td'), 'should wait for the events table');
 
   // check for an entry by Event name in the list of events to see if it is deleted
-  const checkEntry = await elements.hasListing(page, '#Grid_Event > table > tbody > tr', eventName);
+  const checkEntry = await elements.hasListing(page, '#events > tbody > tr', 'event.test.name');
   assert.isFalse(checkEntry, 'should not contain the new event in the table');
 }
 
