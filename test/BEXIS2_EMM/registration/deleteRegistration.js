@@ -64,7 +64,7 @@ async function deleteRegistrationTest(action) {
     await assert.isFulfilled(EMMElements.filterEventByName(page, 'register.event.test.name'), 'should filter the event by name');
 
     // wait for delete icon
-    await assert.isFulfilled(page.waitForSelector('#Events > table > tbody > tr > td:nth-child(1) > div.bx.bx-grid-function.bx-trash'), 'should wait for delete icon');
+    await assert.isFulfilled(page.waitForSelector('#events > tbody > tr > td.sorting_1 > div.bx.bx-grid-function.bx-trash'), 'should wait for delete icon');
 
     // after clicking delete icon. alert box is shown -> click Cancel
     if ('cancel' == action) {
@@ -77,10 +77,10 @@ async function deleteRegistrationTest(action) {
     }
 
     // click Delete icon
-    await assert.isFulfilled(page.click('#Events > table > tbody > tr > td:nth-child(1) > div.bx.bx-grid-function.bx-trash'), 'should click delete icon');
+    await assert.isFulfilled(page.click('#events > tbody > tr > td.sorting_1 > div.bx.bx-grid-function.bx-trash'), 'should click delete icon');
 
     // wait for event table
-    await assert.isFulfilled(page.waitForSelector('#Events > table'), 'should wait for event table');
+    await assert.isFulfilled(page.waitForSelector('#events'), 'should wait for event table');
 
     // check if Register Button exists or not
     let registerButton = await page.evaluate(() => !!document.querySelector('div[title="Register for event"]'));

@@ -52,10 +52,10 @@ describe('Edit Registration', () => {
     await assert.isFulfilled(EMMElements.filterEventByName(page, 'register.event.test.name'), 'should filter the event by name');
 
     // wait for Edit icon
-    await assert.isFulfilled(page.waitForSelector('#Events > table > tbody > tr > td:nth-child(1) > div.bx.bx-grid-function.bx-edit'), 'should wait for edit icon');
+    await assert.isFulfilled(page.waitForSelector('#events > tbody > tr > td.sorting_1 > div.bx.bx-grid-function.bx-edit'), 'should wait for edit icon');
 
     // click Edit icon
-    await assert.isFulfilled(page.click('#Events > table > tbody > tr > td:nth-child(1) > div.bx.bx-grid-function.bx-edit'), 'should click edit icon');
+    await assert.isFulfilled(page.click('#events > tbody > tr > td.sorting_1 > div.bx.bx-grid-function.bx-edit'), 'should click edit icon');
 
     // wait for Event Registration window to be visible
     await assert.isFulfilled(page.waitForSelector('#Window_LogInToEvent', {visible:true}), 'should wait for event registration window to be visible');
@@ -108,8 +108,8 @@ describe('Edit Registration', () => {
     // click a position
     await assert.isFulfilled(page.click('body > div.t-animation-container > div > ul > li:nth-child(3)'), 'should click Postdoc for position');
 
-    // after clicking a random position wait for dropdown to be hidden (margin-top: -177px)
-    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div.t-popup.t-group')).getPropertyValue('margin-top') === '-177px'), 'should wait for dropdown to be hidden');
+    // after clicking a random position wait for dropdown to be hidden (margin-top: -179px)
+    await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div.t-popup.t-group')).getPropertyValue('margin-top') !== '0px'), 'should wait for dropdown to be hidden');
 
     // wait for Additional information
     await assert.isFulfilled(page.waitForSelector('#\\38 9_28_1_1_1_6_Input'), 'should wait for additional information field');
@@ -143,7 +143,8 @@ describe('Edit Registration', () => {
     const registrationContent = await elements.tableContent2D(page, 'body > div.main-content.container-fluid > table > tbody > tr > td:nth-child(3)');
 
     // make a new array from Last Name, First Name, Position, and Additional Information of the edited registered event from the reservation table
-    const editedContent = registrationContent[0].splice(5);
+    // with slice remover the last empty element from the array
+    const editedContent = registrationContent[0].splice(6).slice(0, -1);
 
     // check if the registered event edited correctly
     assert.equal(JSON.stringify(editedContent), JSON.stringify(typedEditContent), 'edited content of the registered event from the reservation table should be equal the typed edit content');

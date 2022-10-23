@@ -226,26 +226,20 @@ async function registerEvent(page, util, assert, emailRegistration) {
   // navigate to "Event Registrations"
   await util.menu.select(page, 'Event Registration');
 
-  // wait for filter icon
-  await page.waitForSelector('#Events > table > thead > tr > th:nth-child(2) > div');
+  // wait for the events table to be loaded in view model
+  await page.waitForSelector('#events', {visible: true});
 
-  // click the filter icon to filter the events by name
-  await page.click('#Events > table > thead > tr > th:nth-child(2) > div');
+  // wait for the Search input
+  await page.waitForSelector('#events_filter', {visible: true});
 
-  // wait for the first input of the filter container
-  await page.waitForSelector('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)');
-
-  // type the event name in the first field of the filter container
-  await page.type('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)', 'register.event.test.name');
-
-  // click Filter button to filter the events
-  await page.click('#Events > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button');
+  // type the event name in the search input
+  await page.type('#events_filter > label > input[type=search]', 'register.event.test.name');
 
   // wait for Register button
-  await page.waitForSelector('#Events > table > tbody > tr > td:nth-child(1) > div');
+  await page.waitForSelector('#events > tbody > tr > td.sorting_1 > div');
 
   // click Register button
-  await page.click('#Events > table > tbody > tr > td:nth-child(1) > div');
+  await page.click('#events > tbody > tr > td.sorting_1 > div');
 
   // wait for Event Registration window to be visible
   await page.waitForSelector('#Window_LogInToEvent', {visible:true});
@@ -302,8 +296,8 @@ async function registerEvent(page, util, assert, emailRegistration) {
   const randomPosition = Math.floor(Math.random() * (maxLength - 2 + 1) + 2); // todo
   await page.click(`body > div.t-animation-container > div > ul > li:nth-child(${randomPosition})`);
 
-  // after clicking a random position wait for dropdown to be hidden (margin-top: -177px)
-  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div.t-popup.t-group')).getPropertyValue('margin-top') === '-177px');
+  // after clicking a random position wait for dropdown to be hidden (margin-top: -179px)
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div.t-popup.t-group')).getPropertyValue('margin-top') !== '0px');
 
   // wait for Additional information
   await page.waitForSelector('#\\38 9_28_1_1_1_6_Input');
@@ -317,23 +311,17 @@ async function registerEvent(page, util, assert, emailRegistration) {
     page.click('#save'),
   ]);
 
-  // wait for filter icon
-  await page.waitForSelector('#Events > table > thead > tr > th:nth-child(2) > div');
+  // wait for the events table to be loaded in view model
+  await page.waitForSelector('#events', {visible: true});
 
-  // click the filter icon to filter the events by name
-  await page.click('#Events > table > thead > tr > th:nth-child(2) > div');
+  // wait for the Search input
+  await page.waitForSelector('#events_filter', {visible: true});
 
-  // wait for the first input of the filter container
-  await page.waitForSelector('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)');
-
-  // type the event name in the first field of the filter container
-  await page.type('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)', 'register.event.test.name');
-
-  // click Filter button to filter the events
-  await page.click('#Events > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button');
+  // type the event name in the search input
+  await page.type('#events_filter > label > input[type=search]', 'register.event.test.name');
 
   // after registration there should be two icons, edit and delete icons, instead of Register button
-  const deleteIconClass = await page.evaluate(() => document.querySelector('#Events > table > tbody > tr:nth-child(1) > td:nth-child(2)').previousSibling.lastElementChild.className.trim());
+  const deleteIconClass = await page.evaluate(() => document.querySelector('#events > tbody > tr > td:nth-child(2)').previousElementSibling.lastElementChild.className.trim());
   assert.equal(deleteIconClass, 'bx bx-grid-function bx-trash', 'the second element child should have bx bx-grid-function bx-trash class name for delete icon');
 }
 
@@ -388,18 +376,12 @@ async function removeEvent(page, util, elements, assert, eventName){
 
 async function filterEventByName(page, name){
 
-  // wait for filter icon
-  await page.waitForSelector('#Events > table > thead > tr > th:nth-child(2) > div');
+  // wait for the events table to be loaded in view model
+  await page.waitForSelector('#events', {visible: true});
 
-  // click the filter icon to filter the events by name
-  await page.click('#Events > table > thead > tr > th:nth-child(2) > div');
+  // wait for the Search input
+  await page.waitForSelector('#events_filter', {visible: true});
 
-  // wait for the first input of the filter container
-  await page.waitForSelector('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)');
-
-  // type the event name in the first field of the filter container
-  await page.type('#Events > div.t-animation-container > div > input[type=text]:nth-child(4)', name);
-
-  // click Filter button to filter the events
-  await page.click('#Events > div.t-animation-container > div > button.t-button.t-button-icontext.t-button-expand.t-filter-button');
+  // type the event name in the search input
+  await page.type('#events_filter > label > input[type=search]', name);
 }
