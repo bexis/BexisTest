@@ -78,10 +78,10 @@ async function createRegistrationTest(skipped) {
     await assert.isFulfilled(EMMElements.filterEventByName(page, 'register.event.test.name'), 'should filter the event by name');
 
     // wait for Register button
-    await assert.isFulfilled(page.waitForSelector('#Events > table > tbody > tr > td:nth-child(1) > div'), 'should wait for register button');
+    await assert.isFulfilled(page.waitForSelector('#events > tbody > tr > td.sorting_1 > div'), 'should wait for register button');
 
     // click Register button
-    await assert.isFulfilled(page.click('#Events > table > tbody > tr > td:nth-child(1) > div'), 'should click register button');
+    await assert.isFulfilled(page.click('#events > tbody > tr > td.sorting_1 > div'), 'should click register button');
 
     // wait for Event Registration window to be visible
     await assert.isFulfilled(page.waitForSelector('#Window_LogInToEvent', {visible:true}), 'should wait for event registration window to be visible');
@@ -174,8 +174,8 @@ async function createRegistrationTest(skipped) {
         const randomPosition = Math.floor(Math.random() * (maxLength - 2 + 1) + 2); // todo
         await assert.isFulfilled(page.click(`body > div.t-animation-container > div > ul > li:nth-child(${randomPosition})`), 'should click a random position');
 
-        // after clicking a random position wait for dropdown to be hidden (margin-top: -177px)
-        await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div.t-popup.t-group')).getPropertyValue('margin-top') === '-177px'), 'should wait for dropdown to be hidden');
+        // after clicking a random position wait for dropdown to be hidden (margin-top: -179px)
+        await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div.t-popup.t-group')).getPropertyValue('margin-top') !== '0px'), 'should wait for dropdown to be hidden');
       }
 
       if(!('additionalInformation' == skipped)){
@@ -190,7 +190,7 @@ async function createRegistrationTest(skipped) {
       // click Save button
       await assert.isFulfilled(page.click('#save'), 'should click save button');
 
-      await assert.isFulfilled(page.waitFor(1000));
+      await assert.isFulfilled(page.waitForTimeout(2000));
 
       // check error messages of the event registration form
       // field validation error box should contain an error

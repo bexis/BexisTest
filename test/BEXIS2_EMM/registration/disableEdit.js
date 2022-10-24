@@ -52,14 +52,14 @@ describe('Disable Edit', () => {
     await assert.isFulfilled(EMMElements.filterEventByName(page, 'register.event.test.name'), 'should filter the event by name');
 
     // after registration there should be two icons, view and delete icons, instead of Register button
-    const viewIconClass = await page.evaluate(() => document.querySelector('#Events > table > tbody > tr:nth-child(1) > td:nth-child(2)').previousSibling.firstElementChild.className.trim());
+    const viewIconClass = await page.evaluate(() => document.querySelector('#events > tbody > tr > td:nth-child(2)').previousElementSibling.firstElementChild.className.trim());
     assert.strictEqual(viewIconClass, 'bx bx-grid-function fa-eye', 'the first element child should have bx bx-grid-function fa-eye class name for view icon');
 
     // wait for View icon
-    await assert.isFulfilled(page.waitForSelector('#Events > table > tbody > tr > td:nth-child(1) > div.bx.bx-grid-function.fa-eye'), 'should wait for view icon');
+    await assert.isFulfilled(page.waitForSelector('#events > tbody > tr > td.sorting_1 > div.bx.bx-grid-function.fa-eye'), 'should wait for view icon');
 
     // click View icon
-    await assert.isFulfilled(page.click('#Events > table > tbody > tr > td:nth-child(1) > div.bx.bx-grid-function.fa-eye'), 'should click view icon');
+    await assert.isFulfilled(page.click('#events > tbody > tr > td.sorting_1 > div.bx.bx-grid-function.fa-eye'), 'should click view icon');
 
     // wait for Event Registration window to be visible
     await assert.isFulfilled(page.waitForSelector('#Window_LogInToEvent', {visible:true}), 'should wait for event registration window to be visible');
