@@ -20,7 +20,7 @@ After cloning the repository run the following command from its root folder to i
 npm install
 ```
 
-Adjust `config.js` to your setup.
+Copy `config.default.js` and name `config.js`. Adjust `config.js` to your setup.
 In particular, you might want to change `browser.baseURL` to point to the instance to run the tests upon.
 
 To run the actual tests, execute the following command again from the root folder of the repository:
