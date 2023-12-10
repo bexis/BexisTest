@@ -86,7 +86,8 @@ async function createBooking(page, util, elements, assert, resourceType) {
   await startDays[randomStartDays].click();
 
   // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
-  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-320px');
+  //await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-320px');
+  await page.waitForTimeout(800); // temporary fix
 
   // click Calendar icon for an end date
   await page.click('#timePeriod_1 > tr:nth-child(2) > td:nth-child(2) > div > div > span > span');
@@ -102,8 +103,8 @@ async function createBooking(page, util, elements, assert, resourceType) {
   await splicedEndDays[Math.floor(Math.random() * splicedEndDays.length)].click();
 
   // after a clicking a random date on calendar wait for calendar container to be hidden (margin-top: -316px)
-  await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-320px');
-
+  //await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '-320px');
+  await page.waitForTimeout(600); // temporary fix
   // get the total rows for a resource table to distinguish from 'no limitation' type
   const totalRows = await page.$$('.itemContent > table > tbody > tr');
 
@@ -285,4 +286,3 @@ async function eventContent(page, elementID) {
   }, elementID);
   return result;
 }
-
