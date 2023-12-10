@@ -49,6 +49,9 @@ async function createEvent(page, util, elements, assert, eventName, editConditio
   // find Event time period and time field
   await page.type('#EventDate', 'event.test.timePeriod');
 
+  // find Event location field
+  await page.type('#Location', 'event.test.location');
+
   // wait for Important information field
   await page.waitForSelector('#ImportantInformation');
 
@@ -104,7 +107,7 @@ async function createEvent(page, util, elements, assert, eventName, editConditio
   } else {
 
     // click Calendar icon for a Start date
-    await page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(6) > td:nth-child(2) > div > div > span > span');
+    await page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(7) > td:nth-child(2) > div > div > span > span');
 
     // wait for calendar container to be visible (margin-top: 0px)
     await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px');
@@ -120,7 +123,7 @@ async function createEvent(page, util, elements, assert, eventName, editConditio
     await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') !== '0px');
 
     // click Calendar icon for Deadline
-    await page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(7) > td:nth-child(2) > div > div > span > span');
+    await page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(8) > td:nth-child(2) > div > div > span > span');
 
     // wait for calendar container to be visible (margin-top: 0px)
     await page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px');
@@ -260,22 +263,22 @@ async function registerEvent(page, util, assert, emailRegistration) {
   ]);
 
   // wait for Last name input field
-  await page.waitForSelector('#\\38 5_27_1_1_1_4_Input');
+  await page.waitForSelector('#\\143_33_1_1_1_4_Input');
 
   // type Last name
-  await page.type('#\\38 5_27_1_1_1_4_Input', 'Doe');
+  await page.type('#\\143_33_1_1_1_4_Input', 'Doe');
 
   // wait for First name input field
-  await page.waitForSelector('#\\38 6_27_1_1_1_4_Input');
+  await page.waitForSelector('#\\144_33_1_1_1_4_Input');
 
   // type First name
-  await page.type('#\\38 6_27_1_1_1_4_Input', 'Jane');
+  await page.type('#\\144_33_1_1_1_4_Input', 'Jane');
 
   // wait for Email input field
-  await page.waitForSelector('#\\38 7_27_1_1_1_4_Input');
+  await page.waitForSelector('#\\146_33_1_1_1_4_Input');
 
   // type Email
-  await page.type('#\\38 7_27_1_1_1_4_Input', emailRegistration);
+  await page.type('#\\146_33_1_1_1_4_Input', emailRegistration);
 
   // wait for the arrow icon on Position field
   await page.waitForSelector('#\\38 8_27_1_1_1_4 > table > tbody > tr:nth-child(2) > td.metadataAttributeInput > div > div > span.t-select > span');

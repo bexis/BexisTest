@@ -21,6 +21,7 @@ describe('Create Event', () => {
   });
 
   createEventTest('eventName');
+  createEventTest('locationName');
   createEventTest('eventPeriod');
   createEventTest('importantInfo');
   createEventTest('eventLanguage');
@@ -79,6 +80,16 @@ async function createEventTest(skipped) {
       await assert.isFulfilled(page.type('#Name', 'event.test.name'), 'should enter a name');
     }
 
+    if (!('locationName' == skipped)) {
+
+      // wait for Event name field
+      await assert.isFulfilled(page.waitForSelector('#Location'), 'should wait for event name field');
+
+      // find Event name field
+      await assert.isFulfilled(page.type('#Location', 'event.test.location'), 'should enter a name');
+    }
+
+
     if (!('eventPeriod' == skipped)) {
 
       // wait for Event time period and time field
@@ -114,7 +125,7 @@ async function createEventTest(skipped) {
     }
 
     // click Calendar icon for a Start date
-    await assert.isFulfilled(page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(6) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for a start date');
+    await assert.isFulfilled(page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(7) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for a start date');
 
     // wait for calendar container to be visible (margin-top: 0px)
     await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px'), 'should wait for calendar container to be visible');
@@ -130,7 +141,7 @@ async function createEventTest(skipped) {
     await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') !=='0px'), 'should wait for calendar container to be hidden');
 
     // click Calendar icon for Deadline
-    await assert.isFulfilled(page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(7) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for deadline');
+    await assert.isFulfilled(page.click('body > div.main-content.container-fluid > table > tbody > tr > td > div > form > table > tbody > tr:nth-child(8) > td:nth-child(2) > div > div > span > span'), 'should click calendar icon for deadline');
 
     // wait for calendar container to be visible (margin-top: 0px)
     await assert.isFulfilled(page.waitForFunction(() => getComputedStyle(document.querySelector('body > div.t-animation-container > div')).getPropertyValue('margin-top') === '0px'), 'should wait for calendar container to be visible');
