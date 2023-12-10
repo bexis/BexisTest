@@ -42,7 +42,7 @@ async function login( page, userType = 'normal') {
   await page.click( 'input[value="Log in"]' );
 
   // wait for landing page after login. Attension: This may differ according to instance settings!!!
-  await page.waitForSelector ('#search_Components');
+  // await page.waitForSelector ('#search_Components');
 }
 
 /**
